@@ -4,6 +4,8 @@ This pipeline was designed to call SNPs in the whole genome and per chromosome t
 
 Some of the resulting files from the pipeline (the SNPs in vcf format, the BAM files, the repeat masking of the reference genome) are used in subsequent pipelines `DiversityStats.smk` and `PaLD.smk`.
 
+The output includes the Figure 2 and the components of S4, plus a plot with SNP correlation coefficients driven the PCA, but I didn't use that in the paper in the end.
+
 ## Building the environment
 
 This pipeline relies on the VariantCallingGATK4 environment, which looks like this:

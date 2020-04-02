@@ -403,11 +403,11 @@ rule plotinR:
 		"results/PodoPop-snps-NoTEs-gatkPASS-miss1.vcf.gz"
 	output:
 		"temp/PodoPop-snps-NoTEs-gatkPASS-miss1.gds",
-		"results/Figures/FigS2_PaPCA_all.pdf", # SNPs from all the chromosomes
-		"results/Figures/PaPCA_corr.pdf",
-		"results/Figures/FigS3_PaPCA12.pdf",
+		"results/Figures/FigS4_PaPCA_all.pdf", # SNPs from all the chromosomes
+		"results/Figures/PaPCA_corr.pdf", # Not used in the paper
+		"results/Figures/FigS4_PaPCA12.pdf",
 		"results/Figures/FigS4_PaPCA13.pdf",
-		"results/Figures/FigS5_PaPCA23.pdf",
+		"results/Figures/FigS4_PaPCA23.pdf",
 		"results/Figures/Fig2_MatingVsSNPs.pdf",
 	conda: 
 		"envs/snprelate.yaml"
