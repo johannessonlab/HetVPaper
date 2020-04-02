@@ -2,6 +2,8 @@
 
 This pipeline was designed to call SNPs in the whole genome and per chromosome to produce PCAs. It also produces the PCoA of mating data derived from the doctoral thesis of Marijn van der Gaag (2005). The necessary metadata is provided in this repository. The reference genome and the repeated elements library are available in the repository of the [Spok paper](https://github.com/johannessonlab/SpokPaper/tree/master/Fig4_S3_Backcrosses/extras).
 
+Some of the resulting files from the pipeline (the SNPs in vcf format, the BAM files, the repeat masking of the reference genome) are used in subsequent pipelines `DiversityStats.smk` and `PaLD.smk`.
+
 ## Building the environment
 
 This pipeline relies on the VariantCallingGATK4 environment, which looks like this:
