@@ -124,4 +124,4 @@ The same, but do:
 
 # The Ecology Figures
 
-Figures 6B and 6C are not part of the pipeline but use one of the files in the `data` folder. The script `scripts/PaEcology.R` can be run in Rstudio, for example to get those figures.
+Figures 6B and 6C are not part of the pipeline but use one of the files in the `data` folder. The script `scripts/PaEcology.R` can be run in Rstudio, for example, to get those figures.
