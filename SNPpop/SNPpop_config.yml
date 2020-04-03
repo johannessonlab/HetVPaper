@@ -12,7 +12,7 @@ Illumina: "data/Illumina" # Expecting files like "data/Illumina/{sample}_postQC.
 Podan2file: "data/Podan2/Podan2_AssemblyScaffoldsmt.fa" # Exactly like this, available at https://github.com/johannessonlab/SpokPaper/tree/master/Fig4_S3_Backcrosses/extras
 
 # Path to repeated elements library
-TElib: "/some/path/to/FungiRepbaseEspagneGioti.lib" # Available at https://github.com/johannessonlab/SpokPaper/tree/master/Fig4_S3_Backcrosses/extras
+TElib: "/path/to/FungiRepbaseEspagneGioti.lib" # Available at https://github.com/johannessonlab/SpokPaper/tree/master/Fig4_S3_Backcrosses/extras
 
 # Plotting script
 rscript: "scripts/PCASNPpop_SNPRelate.R"
