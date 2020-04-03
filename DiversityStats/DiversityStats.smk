@@ -31,7 +31,6 @@ DiversityStatsCalc = config["DiversityStatsCalc"]
 DiversityStatsCalcPlot = config["DiversityStatsCalcPlot"]
 
 # Metadata file
-# metadata = config["metadata"]
 hetgenes = config["hetgenes"]
 # Number of chromosomes (assuming vcf has contigs names like "chromosome_1")
 chrs = list(range(1, config["NCHR"] + 1))
@@ -205,10 +204,9 @@ rule inputmissingsites:
 	""" Input the sites that should be excluded as explicit missing data sites """
 	input:
 		vcf = vcf,
-		# vcf = "filter/" + input_name + "-NoSibs.vcf.gz",
 		bed = "filter/excludedsites.bed",
 	output:
-		"filter/" + input_name + "-NoSibs-withNA.vcf"
+		"filter/" + input_name + "-withNA.vcf"
 	params:
 		badsites2vcf = badsites2vcf
 	shell:
@@ -217,18 +215,18 @@ rule inputmissingsites:
 rule compressvcf:
 	""" Compress and index vcf file """
 	input:
-		"filter/" + input_name + "-NoSibs-withNA.vcf"
+		"filter/" + input_name + "-withNA.vcf"
 	output:
-		"filter/" + input_name + "-NoSibs-withNA.vcf.gz"
+		"filter/" + input_name + "-withNA.vcf.gz"
 	shell:
 		"bgzip {input}"
 
 rule tabix:
 	""" Sanity check, it shouldn't complain """
 	input:
-		"filter/" + input_name + "-NoSibs-withNA.vcf.gz"
+		"filter/" + input_name + "-withNA.vcf.gz"
 	output:
-		"filter/" + input_name + "-NoSibs-withNA.vcf.gz.tbi"
+		"filter/" + input_name + "-withNA.vcf.gz.tbi"
 	shell:
 		"tabix -p vcf {input}" # This is a sanity check, it shouldn't complain	
 
@@ -237,10 +235,10 @@ rule tabix:
 rule extractchrvcf:
 	""" Extract one individual chromosome from the vcf file """
 	input:
-		vcf = "filter/" + input_name + "-NoSibs-withNA.vcf.gz",
-		tbi = "filter/" + input_name + "-NoSibs-withNA.vcf.gz.tbi" # just to force the previous rule to produce it
+		vcf = "filter/" + input_name + "-withNA.vcf.gz",
+		tbi = "filter/" + input_name + "-withNA.vcf.gz.tbi" # just to force the previous rule to produce it
 	output:
-		"data/chr{nchr}/{input_name}-NoSibs-withNA-chr{nchr}.vcf"
+		"data/chr{nchr}/{input_name}-withNA-chr{nchr}.vcf"
 	params:
 		time = "15:00",
 		threads = 1, 
@@ -253,7 +251,7 @@ rule extractchrgff:
 	input:
 		"data/Podan2_genes.gff"
 	output:
-		"data/gffs/{input_name}-NoSibs-withNA-chr{nchr}.gff"
+		"data/gffs/{input_name}-withNA-chr{nchr}.gff"
 	shell:
 		"""
 		grep '#' {input} > {output}
@@ -275,11 +273,11 @@ rule extractchrcov:
 rule removehybridschr5:
 	""" Remove samples with recombinant haplotypes of het-v"""
 	input:
-		vcf = "data/chr5/{input_name}-NoSibs-withNA-chr5.vcf",
-		gff = "data/gffs/{input_name}-NoSibs-withNA-chr5.gff",
+		vcf = "data/chr5/{input_name}-withNA-chr5.vcf",
+		gff = "data/gffs/{input_name}-withNA-chr5.gff",
 	output:
-		vcf = "data/chr5/{input_name}-NoSibs-withNA-chr5-nohybrids.vcf",
-		gff = "data/gffs/{input_name}-NoSibs-withNA-chr5-nohybrids.gff",
+		vcf = "data/chr5/{input_name}-withNA-chr5-nohybrids.vcf",
+		gff = "data/gffs/{input_name}-withNA-chr5-nohybrids.gff",
 	params:
 		time = "15:00",
 		threads = 1, 
@@ -293,8 +291,8 @@ rule FstConfIntervals:
 	""" Calculate the confidence intervals through permutation of Fst """
 	input: # In this order!
 		hetgenes, #metadata,
-		"data/chr{nchr}/" + input_name + "-NoSibs-withNA-chr{nchr}.vcf",
-		"data/gffs/" + input_name + "-NoSibs-withNA-chr{nchr}.gff",
+		"data/chr{nchr}/" + input_name + "-withNA-chr{nchr}.vcf",
+		"data/gffs/" + input_name + "-withNA-chr{nchr}.gff",
 	output:
 		"data/FstReplicas/FstReplicas_chr{nchr}.csv",
 		"results/FstReplicas/FstConfIntv_chr{nchr}.csv",
@@ -311,10 +309,10 @@ rule CalcStats:
 	input:  # In this order!
 		hetgenes, #metadata,
 		"data/cov/excludedsites-chr{nchr}.bed",
-		"data/chr{nchr}/{input_name}-NoSibs-withNA-chr{nchr}.vcf",
-		"data/gffs/{input_name}-NoSibs-withNA-chr{nchr}.gff",
+		"data/chr{nchr}/{input_name}-withNA-chr{nchr}.vcf",
+		"data/gffs/{input_name}-withNA-chr{nchr}.gff",
 	output:
-		"results/stats/{input_name}-NoSibs-withNA-chr{nchr}-stats.csv",
+		"results/stats/{input_name}-withNA-chr{nchr}-stats.csv",
 	params:
 		time = "1-00:00:00",
 		threads = 6, # I need to give these many in case memory is needed
@@ -326,10 +324,10 @@ rule CalcStatsChr5:
 	input:  # In this order!
 		hetgenes, #metadata,
 		"data/cov/excludedsites-chr5.bed",
-		"data/chr5/{input_name}-NoSibs-withNA-chr5-nohybrids.vcf",
-		"data/gffs/{input_name}-NoSibs-withNA-chr5-nohybrids.gff",
+		"data/chr5/{input_name}-withNA-chr5-nohybrids.vcf",
+		"data/gffs/{input_name}-withNA-chr5-nohybrids.gff",
 	output:
-		"results/stats/{input_name}-NoSibs-withNA-chr5-nohybrids-stats.csv",
+		"results/stats/{input_name}-withNA-chr5-nohybrids-stats.csv",
 	params:
 		time = "1-00:00:00",
 		threads = 6, # I need to give these many in case memory is needed
@@ -339,10 +337,10 @@ rule CalcStatsChr5:
 rule plotstats:
 	""" Plot diversity statistics """
 	input: # In this order!
-		expand("results/stats/{input_name}-NoSibs-withNA-chr{nchr}-stats.csv", nchr = chrs, input_name = input_name),
+		expand("results/stats/{input_name}-withNA-chr{nchr}-stats.csv", nchr = chrs, input_name = input_name),
 		expand("results/FstReplicas/FstConfIntv_chr{nchr}.csv", nchr = chrs),
 		hetgenes,
-		expand("results/stats/{input_name}-NoSibs-withNA-chr5-nohybrids-stats.csv", input_name = input_name),
+		expand("results/stats/{input_name}-withNA-chr5-nohybrids-stats.csv", input_name = input_name),
 	output:
 		main2chrs = "results/figures/Fig1_PopData_Main_2Chrs.pdf", # MAIN figure
 		mainSupchrs = "results/figures/FigS2_PopData_Supp.pdf", # MAIN figure 
