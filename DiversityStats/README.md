@@ -56,7 +56,7 @@ dependencies:
 
 In order to remove "bad quality" sites, I basically assumed all the bad sites would come from repeated elements. Hence, I used the `gff` file produced with RepeatMasker from the pipeline `SNPpop.smk`:
     
-    /proj/sllstore2017101/b2015200/SnakePipelines/8_SNPpop/RepeatMasker/Podan2_AssemblyScaffoldsmt.fa.out.gff
+    SNPpop/RepeatMasker/Podan2_AssemblyScaffoldsmt.fa.out.gff
 
 The path to this gff is specified in the configuration file.
 
@@ -69,15 +69,13 @@ This pipeline depends on a given configuration file including the samples, the p
 SampleIDs: ["PaWa1p", "PaWa1m", "PaWa2m", "PaWa3p", "PaWa3m", "PaWa4p", "PaWa7m", "PaWa8p", "PaWa9m", "PaWa10p", "PaWa11m", "PaWa12p", "PaWa13m", "PaWa14p", "PaWa15m", "PaWa16p", "PaWa17m", "PaWa18p", "PaWa19m", "PaWa21p", "PaWa21m", "PaWa22m", "PaWa23p", "PaWa24m", "PaWa25p", "PaWa26m", "PaWa27p", "PaWa27m", "PaWa28p", "PaWa28m", "PaWa29p", "PaWa32p", "PaWa32m", "PaWa33m", "PaWa36p", "PaWa37m", "PaWa38p", "PaWa39m", "PaWa40m", "PaWa41p", "PaWa42m", "PaWa43p", "PaWa44m", "PaWa45p", "PaWa46p", "PaWa46m", "PaWa47p", "PaWa47m", "PaWa49m", "PaWa52p", "PaWa53p", "PaWa53m", "PaWa54m", "PaWa55p", "PaWa56m", "PaWa57p", "PaWa58p", "PaWa58m", "PaWa59m", "PaWa60p", "PaWa61m", "PaWa62p", "PaWa63p", "PaWa63m", "PaWa64m", "PaWa66m", "PaWa67p", "PaWa68m", "PaWa69p", "PaWa70m", "PaWa71p", "PaWa72m", "PaWa76p", "PaWa77m", "PaWa78p", "PaWa79m", "PaWa81p", "PaWa83m", "PaWa85p", "PaWa85m", "PaWa86m", "PaWa87p", "PaWa87m", "PaWa88p", "PaWa89p", "PaWa91p", "PaWa92p", "PaWa94p", "PaWa95p", "PaWa96m", "PaWa97p", "PaWa98m", "PaWa99p", "PaWa100p", "PaWa100m1", "PaWa101m", "PaWa102p", "PaWa103m", "PaWa104m", "PaWa105p", "PaWa106p", "PaWa107m", "PaWa108m", "PaWa109p", "PaWa115m", "PaWa116p", "PaWa117m", "PaWa118p", "PaWa122m", "PaWa123p", "PaWa124p", "PaWa125m", "PaWa126p", "PaWa127m", "PaWa128p", "PaWa129p", "PaWa137m", "PaWa138m", "PaWa142p", "PaWa143m", "CBS433.50p", "CBS455.64m", "PaTgp", "PaYp", "PaZp", "PaSp"]
 
 ## The variants file produced by SNPpop.smk
-vcf: "SNPpop/results/PodoPop-snps.vcf.gz"
+vcf: "path/to/SNPpop/results/PodoPop-snps.vcf.gz"
 
 ## The gff of sites to replace for missing data, produced by SNPpop.smk
-# TEgff: "SNPpop/RepeatMasker/Podan2_AssemblyScaffoldsmt.fa.out.gff"
-TEgff: "/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/RepeatMasker/Podan2_AssemblyScaffoldsmt.fa.out.gff"
+TEgff: "path/to/SNPpop/RepeatMasker/Podan2_AssemblyScaffoldsmt.fa.out.gff"
 
 # Path to the BAM files produced by SNPpop.smk 
-# path2BAM: "SNPpop/mapping"
-path2BAM: "/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/mapping"
+path2BAM: "path/to/SNPpop/mapping"
 
 ## Scripts
 badsites2vcf: "scripts/badsites2vcf.py" # v. 1.2, in repo
@@ -98,13 +96,9 @@ NCHR: 7
 
 ## Run pipeline in Uppmax
 
-Get into the folder:
-
-    $ cd /proj/sllstore2017101/b2015200/SnakePipelines/9b_DiversityStatsWa
-    $ conda activate DiversityStats
-
 First, to get an idea of how the pipeline looks like we can make a rulegraph:
 
+    $ conda activate DiversityStats
     $ snakemake --snakefile DiversityStats.smk --configfile DiversityStats_config.yml --rulegraph | dot -Tpng > tmp/rulegraph.png
 
 ![rulegraph](rulegraph.png "rulegraph of Backcrosses.smk")
@@ -118,7 +112,7 @@ Run the pipeline:
     $ screen -R DiversityStats
     # Important to activate environment!!
     $ conda activate DiversityStats
-    $ snakemake --snakefile DiversityStats.smk --configfile DiversityStats_config.yml -p --cluster "sbatch -A snic2017-1-567 -p core -n {params.threads} -t {params.time} --mail-user sandra.ament@evobio.eu --mail-type=ALL" -j 20 --keep-going --use-conda &> DiversityStats.log &
+    $ snakemake --snakefile DiversityStats.smk --configfile DiversityStats_config.yml -p --cluster "sbatch -A snicXXXX-X-XXX -p core -n {params.threads} -t {params.time} --mail-user xxxxxx@xxxxx.xx --mail-type=ALL" -j 20 --keep-going --use-conda &> DiversityStats.log &
 
 
 ## Run pipeline locally
