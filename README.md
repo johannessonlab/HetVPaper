@@ -11,7 +11,7 @@ Each pipeline in turn depends on a small conda environment(s), as explained in t
 
 As output of all the pipelines there is a `results` folder that usually contains the figures used in the paper. 
 
-I ran the pipelines in Uppsala University's supercomputer[UPPMAX](https://uppmax.uu.se/), which has a CentOS Linux operating system with a slurm scheduler. However, they should work fine also in other unix environments.
+I ran the pipelines in Uppsala University's supercomputer [UPPMAX](https://uppmax.uu.se/), which has a CentOS Linux operating system with a slurm scheduler. However, they should work fine also in other unix environments.
 
 
   
