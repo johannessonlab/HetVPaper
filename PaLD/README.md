@@ -58,15 +58,10 @@ dependencies:
 
 ## Run pipeline in Uppmax
 
-Get into the folder:
-
-    $ cd /proj/sllstore2017101/b2015200/SnakePipelines/12_PaLD
-    $ conda activate PaLD
-
 First, to get an idea of how the pipeline looks like we can make a rulegraph:
     
-    $ mkdir tmp
-    $ snakemake --snakefile PaLD.smk --configfile PaLD_config.yaml --rulegraph | dot -Tpng > tmp/rulegraph.png
+    $ conda activate PaLD
+    $ snakemake --snakefile PaLD.smk --configfile PaLD_config.yaml --rulegraph | dot -Tpng > rulegraph.png
 
 ![rulegraph](rulegraph.png "rulegraph of Backcrosses.smk")
 
@@ -79,7 +74,7 @@ Run the pipeline:
     $ screen -R PaLD
     # Important to activate environment!!
     $ conda activate PaLD
-    $ snakemake --snakefile PaLD.smk --configfile PaLD_config.yaml -p --cluster "sbatch -A snic2017-1-567 -p core -n {params.threads} -t {params.time} --mail-user sandra.ament@evobio.eu --mail-type=ALL" -j 20 --keep-going --use-conda &> PaLD.log &
+    $ snakemake --snakefile PaLD.smk --configfile PaLD_config.yaml -p --cluster "sbatch -A snicXXXX-X-XXX -p core -n {params.threads} -t {params.time} --mail-user xxxxxxxxxxxx@xxxxx.xx --mail-type=ALL" -j 20 --keep-going --use-conda &> PaLD.log &
 
 ## Run pipeline locally
 
