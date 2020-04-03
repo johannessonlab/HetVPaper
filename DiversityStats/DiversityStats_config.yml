@@ -1,0 +1,31 @@
+## Configuration file for the DiversityStats pipeline
+# Het-v paper
+# ---------------------------------------------------
+
+## List of samples to analyze
+SampleIDs: ["PaWa1p", "PaWa1m", "PaWa2m", "PaWa3p", "PaWa3m", "PaWa4p", "PaWa7m", "PaWa8p", "PaWa9m", "PaWa10p", "PaWa11m", "PaWa12p", "PaWa13m", "PaWa14p", "PaWa15m", "PaWa16p", "PaWa17m", "PaWa18p", "PaWa19m", "PaWa21p", "PaWa21m", "PaWa22m", "PaWa23p", "PaWa24m", "PaWa25p", "PaWa26m", "PaWa27p", "PaWa27m", "PaWa28p", "PaWa28m", "PaWa29p", "PaWa32p", "PaWa32m", "PaWa33m", "PaWa36p", "PaWa37m", "PaWa38p", "PaWa39m", "PaWa40m", "PaWa41p", "PaWa42m", "PaWa43p", "PaWa44m", "PaWa45p", "PaWa46p", "PaWa46m", "PaWa47p", "PaWa47m", "PaWa49m", "PaWa52p", "PaWa53p", "PaWa53m", "PaWa54m", "PaWa55p", "PaWa56m", "PaWa57p", "PaWa58p", "PaWa58m", "PaWa59m", "PaWa60p", "PaWa61m", "PaWa62p", "PaWa63p", "PaWa63m", "PaWa64m", "PaWa66m", "PaWa67p", "PaWa68m", "PaWa69p", "PaWa70m", "PaWa71p", "PaWa72m", "PaWa76p", "PaWa77m", "PaWa78p", "PaWa79m", "PaWa81p", "PaWa83m", "PaWa85p", "PaWa85m", "PaWa86m", "PaWa87p", "PaWa87m", "PaWa88p", "PaWa89p", "PaWa91p", "PaWa92p", "PaWa94p", "PaWa95p", "PaWa96m", "PaWa97p", "PaWa98m", "PaWa99p", "PaWa100p", "PaWa100m1", "PaWa101m", "PaWa102p", "PaWa103m", "PaWa104m", "PaWa105p", "PaWa106p", "PaWa107m", "PaWa108m", "PaWa109p", "PaWa115m", "PaWa116p", "PaWa117m", "PaWa118p", "PaWa122m", "PaWa123p", "PaWa124p", "PaWa125m", "PaWa126p", "PaWa127m", "PaWa128p", "PaWa129p", "PaWa137m", "PaWa138m", "PaWa142p", "PaWa143m", "CBS433.50p", "CBS455.64m", "PaTgp", "PaYp", "PaZp", "PaSp"]
+
+## The variants file produced by SNPpop.smk
+vcf: "path/to/SNPpop/results/PodoPop-snps.vcf.gz"
+
+## The gff of sites to replace for missing data, produced by SNPpop.smk
+TEgff: "path/to/SNPpop/RepeatMasker/Podan2_AssemblyScaffoldsmt.fa.out.gff"
+
+# Path to the BAM files produced by SNPpop.smk 
+path2BAM: "path/to/SNPpop/mapping"
+
+## Scripts
+badsites2vcf: "scripts/badsites2vcf.py" # v. 1.2, in repo
+totalcovergff: "scripts/totalcovergff.py" # v. 2.0, Available at: https://github.com/SLAment/Genomics/tree/master/GenomeAnnotation
+
+# In the repo
+DiversityStats_vcfR_plotter: "scripts/DiversityStats_vcfR_plotter.R"
+DiversityStatsFstInterv: "scripts/DiversityStatsFstInterv.R"
+DiversityStatsCalc: "scripts/DiversityStatsCalc.R"
+DiversityStatsCalcPlot: "scripts/DiversityStatsCalcPlot.R"
+
+# Metadata file
+hetgenes: "data/PaAllelesPaper.csv"
+
+# Number of chromosomes (assuming vcf has contigs names like "chromosome_1")
+NCHR: 7

@@ -1,0 +1,9 @@
+channels:
+  - bioconda
+  - defaults
+  - conda-forge
+  - r
+dependencies:
+  - snakemake-minimal=5.4.4
+  - vcftools=0.1.16
+  - htslib=1.9
