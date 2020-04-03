@@ -48,8 +48,6 @@ alleledata <- melt(hetrecord %>% select(SampleID, Year, Het.v, Het.Z, Het.r_phen
 names(alleledata)[3:4] <- c("Het", "Allele")
 
 PopDataChr5noHybrids <- read.csv(snakemake@input[[16]], header = TRUE, sep=",")
-# gff_file <- snakemake@input[[17]]
-# TE_file <- snakemake@input[[18]]
 
 # ------
 
