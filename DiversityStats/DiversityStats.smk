@@ -54,10 +54,10 @@ rule all:
 		expand("results/FstReplicas/FstConfIntv_chr{nchr}.csv", nchr = chrs), 
 
 		# Final plot of figures
-		"results/figures/Fig1_PopData_Main_2Chrs.pdf", # MAIN figure 
-		"results/figures/FigS2_PopData_Supp.pdf", # MAIN figure 
-		"results/figures/Fig3_FstAll.pdf", # MAIN figure 
-		"results/figures/FigS5_Dxy_supp.pdf", # MAIN figure 
+		"results/figures/Fig1_PopData_Main_2Chrs.png", # MAIN figure 
+		"results/figures/FigS2_PopData_Supp.png", # MAIN figure 
+		"results/figures/Fig3_FstAll.png", # MAIN figure 
+		"results/figures/FigS5_Dxy_supp.png", # MAIN figure 
 		"results/figures/Fig4_HetVRgenotypes.pdf", # MAIN figure
 		"results/stats/highTajima.csv", # Useful here
 
@@ -342,11 +342,11 @@ rule plotstats:
 		hetgenes,
 		expand("results/stats/{input_name}-withNA-chr5-nohybrids-stats.csv", input_name = input_name),
 	output:
-		main2chrs = "results/figures/Fig1_PopData_Main_2Chrs.pdf", # MAIN figure
-		mainSupchrs = "results/figures/FigS2_PopData_Supp.pdf", # MAIN figure 
+		main2chrs = "results/figures/Fig1_PopData_Main_2Chrs.png", # MAIN figure
+		mainSupchrs = "results/figures/FigS2_PopData_Supp.png", # MAIN figure 
 		hetrvtime = "results/figures/Fig4_HetVRgenotypes.pdf", # MAIN figure
-		mainfst = "results/figures/Fig3_FstAll.pdf", # MAIN figure 
-		supdxy = "results/figures/FigS5_Dxy_supp.pdf", # MAIN figure 
+		mainfst = "results/figures/Fig3_FstAll.png", # MAIN figure 
+		supdxy = "results/figures/FigS5_Dxy_supp.png", # MAIN figure 
 		extratajima = "results/figures/Tajima_supp.pdf", # Useful for me
 		tajimatable = "results/stats/highTajima.csv", # Useful here
 	conda: 

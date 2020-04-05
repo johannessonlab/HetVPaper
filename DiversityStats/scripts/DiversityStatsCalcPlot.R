@@ -325,7 +325,7 @@ diversitystats2 <- plot_grid(PopDataChr1plots,
 
 plot_grid(diversitystats2, NULL, hetplots, ncol = 3, labels = c('A', '', 'B'),
           label_size = 25, rel_widths = c(2, 0.05, 1))
-ggsave(snakemake@output$main2chrs, width = 42, height = 28, units = "cm")
+ggsave(snakemake@output$main2chrs, width = 14, height = 9)
 
 plot_grid(PopDataChr2plots,
           NULL,
@@ -339,7 +339,7 @@ plot_grid(PopDataChr2plots,
           rel_heights = c(1, 0.05, 1, 0.05, 1, 0.05, 1, 0.05, 1),
           label_size = 12, ncol = 1) # , labels = c('A', 'B')
 
-ggsave(snakemake@output$mainSupchrs, width = 25, height = 56, units = "cm")
+ggsave(snakemake@output$mainSupchrs, width = 10, height = 22)
 
 # ============================
 ### ------ The allele frequencies through time for het-v and het-r -----
@@ -438,7 +438,7 @@ allFstp <- plot_grid(fst.plotter(PopDataChr1, FstConfIntvChr1, thistitle = "Chro
           align = "v", ncol = 1) 
 allFst <- grid.arrange(arrangeGrob(allFstp, left = y.grob, bottom = x.grob))
 
-ggsave(plot = allFst, snakemake@output$mainfst, width = 23, height = 34, units = "cm")
+ggsave(plot = allFst, snakemake@output$mainfst, width = 8, height = 12)
 
 # ============================
 ### ------ Plotting Dxy values -----
