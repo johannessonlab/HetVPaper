@@ -20,8 +20,6 @@ tablecov <- snakemake@output[[2]]
 lquantile = snakemake@params$lquantile
 uquantile = snakemake@params$uquantile
 
-vcffile <- "/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/PodoPop-snps.vcf.gz"
-
 # ============================
 # Load the necessary libraries
 # ============================
