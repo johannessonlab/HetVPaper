@@ -322,36 +322,36 @@ pcaperchr <- function(genofile, chr = 1, cores = 4, LD = 1, pc1 = 1, pc2 = 2){
 pdf(snakemake@output[[4]], height=7, width=15)
 # pdf("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/figures/PaPCA12.pdf", width = 15, height = 8)
 plot_grid(pcaperchr(genofile, chr = "1"),
-          pcaperchr(genofile, chr = "5"),
           pcaperchr(genofile, chr = "2"),
-          pcaperchr(genofile, chr = "6"),
           pcaperchr(genofile, chr = "3"),
-          pcaperchr(genofile, chr = "7"),
           pcaperchr(genofile, chr = "4"),
+          pcaperchr(genofile, chr = "5"),
+          pcaperchr(genofile, chr = "6"),
+          pcaperchr(genofile, chr = "7"),
           ncol=4)
 dev.off()
 
 pdf(snakemake@output[[5]], height=7, width=15)
 # pdf("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/figures/PaPCA13.pdf", width = 15, height = 8)
 plot_grid(pcaperchr(genofile, chr = "1", pc2 = 3),
-          pcaperchr(genofile, chr = "5", pc2 = 3),
           pcaperchr(genofile, chr = "2", pc2 = 3),
-          pcaperchr(genofile, chr = "6", pc2 = 3),
           pcaperchr(genofile, chr = "3", pc2 = 3),
-          pcaperchr(genofile, chr = "7", pc2 = 3),
           pcaperchr(genofile, chr = "4", pc2 = 3),
+          pcaperchr(genofile, chr = "5", pc2 = 3),
+          pcaperchr(genofile, chr = "6", pc2 = 3),
+          pcaperchr(genofile, chr = "7", pc2 = 3),
           ncol=4)
 dev.off()
 
 pdf(snakemake@output[[6]], height=7, width=15)
 # pdf("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/figures/PaPCA23.pdf", width = 15, height = 8)
 plot_grid(pcaperchr(genofile, chr = "1", pc1 = 2, pc2 = 3),
-          pcaperchr(genofile, chr = "5", pc1 = 2, pc2 = 3),
           pcaperchr(genofile, chr = "2", pc1 = 2, pc2 = 3),
-          pcaperchr(genofile, chr = "6", pc1 = 2, pc2 = 3),
           pcaperchr(genofile, chr = "3", pc1 = 2, pc2 = 3),
-          pcaperchr(genofile, chr = "7", pc1 = 2, pc2 = 3),
           pcaperchr(genofile, chr = "4", pc1 = 2, pc2 = 3),
+          pcaperchr(genofile, chr = "5", pc1 = 2, pc2 = 3),
+          pcaperchr(genofile, chr = "6", pc1 = 2, pc2 = 3),
+          pcaperchr(genofile, chr = "7", pc1 = 2, pc2 = 3),
           ncol=4)
 dev.off()
 
