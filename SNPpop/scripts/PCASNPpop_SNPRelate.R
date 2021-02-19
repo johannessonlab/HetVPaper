@@ -48,79 +48,19 @@ workinggds <- snakemake@output[[1]] # For the produced gds file
 cores = snakemake@threads
 # cores = 4
 
-
-# ============================
-# Functions
-# ============================
-# Multiple plot function by Guru-Blard
-# http://www.guru-gis.net/multiplot-function-for-ggplot/
-#
-# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
-# - cols:   Number of columns in layout
-# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
-#
-# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
-# then plot 1 will go in the upper left, 2 will go in the upper right, and
-# 3 will go all the way across the bottom.
-#
-multiplot <- function(..., plotlist = NULL, file, cols = 1, layout = NULL, title="", fontsize = 12, fontfamily = "Helvetica") {
-  require(grid)
-  
-  # Make a list from the ... arguments and plotlist
-  plots <- c(list(...), plotlist)
-  
-  numPlots = length(plots)
-  
-  # If layout is NULL, then use 'cols' to determine layout
-  if (is.null(layout)) {
-    # Make the panel
-    # ncol: Number of columns of plots
-    # nrow: Number of rows needed, calculated from # of cols
-    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
-                     ncol = cols, nrow = ceiling(numPlots/cols))
-  }
-  
-  if (nchar(title)>0){
-    layout <- rbind(rep(0, ncol(layout)), layout)
-  }
-  
-  if (numPlots==1) {
-    print(plots[[1]])
-    
-  } else {
-    # Set up the page
-    grid.newpage()
-    pushViewport(viewport(layout = grid.layout(nrow(layout), 
-                                               ncol(layout), 
-                                               heights = if (nchar(title)>0) {unit(c(0.5, rep(5,nrow(layout)-1)), "null")}
-                                               else {unit(c(rep(5, nrow(layout))), "null")})))
-    
-    # Make each plot, in the correct location
-    if (nchar(title)>0) {
-      grid.text(title, 
-                vp = viewport(layout.pos.row = 1, layout.pos.col = 1:ncol(layout)),
-                gp = gpar(fontsize = fontsize, fontfamily = fontfamily))
-    }
-    
-    for (i in 1:numPlots) {
-      # Get the i,j matrix positions of the regions that contain this subplot
-      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
-      
-      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
-                                      layout.pos.col = matchidx$col))
-    }
-  }
-}
-
 # ============================
 # PCoA of mating data
 # ============================
-# Remove little s
+# Remove little s because we didn't sequence that one
 podandm <- podandm[podandm$X != "s", colnames(podandm) != "s"]
 
 print("Calculating PCoA of the mating data from van der Gaag (2005) ...", quote=FALSE)
-# Convert distance matrix to dissimilarity matrix with gower distance
-d2 <- daisy(podandm)
+
+# The data is not actually numerical but ordinal
+podandm[sapply(podandm, is.numeric)] <- lapply(podandm[sapply(podandm, is.numeric)], factor, order = TRUE, levels = c("1", "2", "3", "4", "5", "6")) 
+
+# Convert distance matrix to dissimilarity matrix with gower distance (data is ordinal)
+d2 <- daisy(podandm %>% select(-X), metric = "gower") # The column of strain ID has to be removed, otherwise it turns them into binary data and artificially adds them to the distances
 
 # Use Partitioning Around Medioids (pam) to determine membership to K clusters
 pam_fit2 <- pam(d2, k=2)
@@ -165,9 +105,9 @@ getvariancePCoA <- function(PCoA){
 ### Getting ammount of variance explained
 # following http://r-sig-ecology.471788.n2.nabble.com/Variability-explanations-for-the-PCO-axes-as-in-Anderson-and-Willis-2003-td6429547.html 
 # Because of the negative values of the eigenvalues
-# cmdscale(d2, k=NROW(podandm)-1, eig = TRUE)$eig  #only 26 of the first 45 eigenvalues are > 0
-PCoA <- cmdscale(d2, k=NROW(podandm)-1, eig = TRUE, add = TRUE)
-varianza <- getvariancePCoA(cmdscale(d2, k=NROW(podandm)-1, eig = TRUE, add = TRUE)) # 17.0  6.1 # This matches the output of clusplot, sort of!
+# cmdscale(d2, k=NROW(podandm %>% select(-X))-1, eig = TRUE)$eig  #only 31 of the first 45 eigenvalues are > 0
+PCoA <- cmdscale(d2, k=NROW(podandm %>% select(-X))-1, eig = TRUE, add = TRUE)
+varianza <- getvariancePCoA(cmdscale(d2, k=NROW(podandm %>% select(-X))-1, eig = TRUE, add = TRUE)) # 16.00  5.88 # This matches the output of clusplot perfectly!
 # But the coordiantes are the same as cmdscale(d2, eig = TRUE)!
 
 ## Make a dataframe with all info for plotting
@@ -221,7 +161,7 @@ print("Plotting a PCA of all the SNPs in the genome ...", quote=FALSE)
 ## LD-based SNP pruning
 set.seed(1000)
 # Try different LD thresholds for sensitivity analysis (and MAF)
-snpset <- snpgdsLDpruning(genofile, ld.threshold=1, autosome.only=FALSE, maf = 0.01, num.thread = cores) # Without the MAF filtering, S behaves weird
+snpset <- snpgdsLDpruning(genofile, ld.threshold=1, autosome.only=FALSE, maf = 0.01, num.thread = cores, slide.max.bp=10000) # Without the MAF filtering, S behaves weird; the value of slide.max.bp is 10 kb to match the genome scans and because LD decay is already very low at that point for most chromosomes. 
 
 # Get all selected snp id
 snpset.id <- unlist(snpset)
@@ -269,7 +209,12 @@ allsnppca13 <- ggplot(allsnppca, aes(x = EV1, y = EV3, colour = colors, fill = c
 
 pdf(snakemake@output[[2]], height=5, width=10)
 # pdf("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/figures/FigS4_PaPCA_all.pdf", height=5, width=10)
-multiplot(allsnppca12, allsnppca13, cols=2, title = "Whole genome SNP data", fontsize = 20)
+# multiplot(allsnppca12, allsnppca13, cols=2, title = "Whole genome SNP data", fontsize = 20)
+
+plot_row <- plot_grid(allsnppca12, allsnppca13, ncol=2)
+title <- ggdraw() + draw_label("Whole genome SNP data", size = 20)
+plot_grid(title, plot_row,  ncol = 1, rel_heights = c(0.1, 1) )
+
 dev.off()
 
 
@@ -318,7 +263,7 @@ corrpc2 <- ggplot(CORRdf, aes(x = pos, y = corr2, colour = chr)) + geom_point(si
 
 pdf(snakemake@output[[3]], height=7, width=15)
 # pdf("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/Figures/PaPCA_corr.pdf", height=7, width=13)
-multiplot(corrpc1, corrpc2, cols=2, fontsize = 20)
+plot_grid(corrpc1, corrpc2, ncol=2)
 dev.off()
 
 # ============================
@@ -329,6 +274,7 @@ print("Plotting a SNPs PCA per chromosome ...", quote=FALSE)
 snpid <- read.gdsn(index.gdsn(genofile, "snp.id"))
 CORRdf <- cbind(snpid, CORRdf)
 
+## Function to plot the PCA of each chromosome for different combinations of eigenvalues
 pcaperchr <- function(genofile, chr = 1, cores = 4, LD = 1, pc1 = 1, pc2 = 2){
   chrname = paste0("Chr", chr)
   
@@ -375,38 +321,38 @@ pcaperchr <- function(genofile, chr = 1, cores = 4, LD = 1, pc1 = 1, pc2 = 2){
 
 pdf(snakemake@output[[4]], height=7, width=15)
 # pdf("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/figures/PaPCA12.pdf", width = 15, height = 8)
-multiplot(pcaperchr(genofile, chr = "1"),
+plot_grid(pcaperchr(genofile, chr = "1"),
           pcaperchr(genofile, chr = "5"),
           pcaperchr(genofile, chr = "2"),
           pcaperchr(genofile, chr = "6"),
           pcaperchr(genofile, chr = "3"),
           pcaperchr(genofile, chr = "7"),
           pcaperchr(genofile, chr = "4"),
-          cols=4)
+          ncol=4)
 dev.off()
 
 pdf(snakemake@output[[5]], height=7, width=15)
 # pdf("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/figures/PaPCA13.pdf", width = 15, height = 8)
-multiplot(pcaperchr(genofile, chr = "1", pc2 = 3),
+plot_grid(pcaperchr(genofile, chr = "1", pc2 = 3),
           pcaperchr(genofile, chr = "5", pc2 = 3),
           pcaperchr(genofile, chr = "2", pc2 = 3),
           pcaperchr(genofile, chr = "6", pc2 = 3),
           pcaperchr(genofile, chr = "3", pc2 = 3),
           pcaperchr(genofile, chr = "7", pc2 = 3),
           pcaperchr(genofile, chr = "4", pc2 = 3),
-          cols=4)
+          ncol=4)
 dev.off()
 
 pdf(snakemake@output[[6]], height=7, width=15)
 # pdf("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/figures/PaPCA23.pdf", width = 15, height = 8)
-multiplot(pcaperchr(genofile, chr = "1", pc1 = 2, pc2 = 3),
+plot_grid(pcaperchr(genofile, chr = "1", pc1 = 2, pc2 = 3),
           pcaperchr(genofile, chr = "5", pc1 = 2, pc2 = 3),
           pcaperchr(genofile, chr = "2", pc1 = 2, pc2 = 3),
           pcaperchr(genofile, chr = "6", pc1 = 2, pc2 = 3),
           pcaperchr(genofile, chr = "3", pc1 = 2, pc2 = 3),
           pcaperchr(genofile, chr = "7", pc1 = 2, pc2 = 3),
           pcaperchr(genofile, chr = "4", pc1 = 2, pc2 = 3),
-          cols=4)
+          ncol=4)
 dev.off()
 
 # ============================
