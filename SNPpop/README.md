@@ -4,7 +4,6 @@ This pipeline was designed to call SNPs in the whole genome and per chromosome t
 
 Some of the resulting files from the pipeline (the SNPs in vcf format, the BAM files, the repeat masking of the reference genome) are used in subsequent pipelines `DiversityStats.smk` and `PaLD.smk`.
 
-The output includes the Figure 2 and the components of S4, plus a plot with SNP correlation coefficients driven the PCA, but I didn't use that in the paper in the end.
 
 ## Building the environment
 
@@ -101,3 +100,7 @@ Run the pipeline:
     $ snakemake --snakefile SNPpop.smk --configfile SNPpop_config.yml -p --cluster "sbatch -A XXXXXXXX -p core -n {params.threads} -t {params.time} --mail-user xxxxxx@xxxxxxx.xxx --mail-type=ALL" -j 20 --keep-going --use-conda &> SNPpop.log &
 
 Notice that sometimes GATK freaks out and crashes if more than one thread is used. So I ended up running the whole thing with one thread.
+
+## Results
+
+The output includes the Fig. 2A and fig. S4, plus a plot with SNP correlation coefficients driven the PCA, but I didn't use that in the paper in the end.
