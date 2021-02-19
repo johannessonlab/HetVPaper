@@ -55,8 +55,9 @@ rule all:
 		# Some numbers on the number of sites filtered
 		"results/filteringstats.txt",
 		# Figures
-		"results/Figures/Fig2_MatingVsSNPs.pdf" # The main figure
-
+		"results/Figures/Fig2_MatingVsSNPs.pdf", # The main figure
+		"results/Figures/FigS4_PCAs.pdf" # The supplementary figure
+		
 # ---------------------------------
 
 rule indexbwa:
@@ -402,13 +403,14 @@ rule plotinR:
 		matingdata,
 		"results/PodoPop-snps-NoTEs-gatkPASS-miss1.vcf.gz"
 	output:
-		"temp/PodoPop-snps-NoTEs-gatkPASS-miss1.gds",
-		"results/Figures/FigS4_PaPCA_all.pdf", # SNPs from all the chromosomes
+		"temp/PodoPop-snps-NoTEs-gatkPASS-NoSibs-miss1.gds",
+		"results/Figures/PaPCA_all.pdf", # SNPs from all the chromosomes
 		"results/Figures/PaPCA_corr.pdf", # Not used in the paper
-		"results/Figures/FigS4_PaPCA12.pdf",
-		"results/Figures/FigS4_PaPCA13.pdf",
-		"results/Figures/FigS4_PaPCA23.pdf",
+		"results/Figures/PaPCA12.pdf",
+		"results/Figures/PaPCA13.pdf",
+		"results/Figures/PaPCA23.pdf",
 		"results/Figures/Fig2_MatingVsSNPs.pdf",
+		"results/Figures/FigS4_PCAs.pdf",
 	conda: 
 		"envs/snprelate.yaml"
 	params:

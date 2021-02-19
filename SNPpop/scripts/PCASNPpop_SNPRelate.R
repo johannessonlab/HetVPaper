@@ -207,15 +207,13 @@ allsnppca13 <- ggplot(allsnppca, aes(x = EV1, y = EV3, colour = colors, fill = c
         legend.position = "none") + 
   scale_color_manual(values=c("#B66DE9", "darkseagreen3", "#999999"))
 
-pdf(snakemake@output[[2]], height=5, width=10)
-# pdf("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/figures/FigS4_PaPCA_all.pdf", height=5, width=10)
-# multiplot(allsnppca12, allsnppca13, cols=2, title = "Whole genome SNP data", fontsize = 20)
-
+# Plot the whole genome data
 plot_row <- plot_grid(allsnppca12, allsnppca13, ncol=2)
 title <- ggdraw() + draw_label("Whole genome SNP data", size = 20)
-plot_grid(title, plot_row,  ncol = 1, rel_heights = c(0.1, 1) )
+PCAallgenome <- plot_grid(title, plot_row,  ncol = 1, rel_heights = c(0.1, 1) )
 
-dev.off()
+ggsave(snakemake@output[[2]], plot=PCAallgenome, width = 5, height = 10)
+# ggsave("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/figures/FigS4_PaPCA_all.pdf", plot=PCAallgenome, width = 5, height = 10)
 
 
 # ============================
@@ -319,41 +317,38 @@ pcaperchr <- function(genofile, chr = 1, cores = 4, LD = 1, pc1 = 1, pc2 = 2){
 }
 
 
-pdf(snakemake@output[[4]], height=7, width=15)
+PaPCA12 <- plot_grid(pcaperchr(genofile, chr = "1"),
+                     pcaperchr(genofile, chr = "2"),
+                     pcaperchr(genofile, chr = "3"),
+                     pcaperchr(genofile, chr = "4"),
+                     pcaperchr(genofile, chr = "5"),
+                     pcaperchr(genofile, chr = "6"),
+                     pcaperchr(genofile, chr = "7"),
+                     ncol=4)
+ggsave(snakemake@output[[4]], plot=PaPCA12, width = 7, height = 15)
 # pdf("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/figures/PaPCA12.pdf", width = 15, height = 8)
-plot_grid(pcaperchr(genofile, chr = "1"),
-          pcaperchr(genofile, chr = "2"),
-          pcaperchr(genofile, chr = "3"),
-          pcaperchr(genofile, chr = "4"),
-          pcaperchr(genofile, chr = "5"),
-          pcaperchr(genofile, chr = "6"),
-          pcaperchr(genofile, chr = "7"),
-          ncol=4)
-dev.off()
 
-pdf(snakemake@output[[5]], height=7, width=15)
+PaPCA13 <- plot_grid(pcaperchr(genofile, chr = "1", pc2 = 3),
+                     pcaperchr(genofile, chr = "2", pc2 = 3),
+                     pcaperchr(genofile, chr = "3", pc2 = 3),
+                     pcaperchr(genofile, chr = "4", pc2 = 3),
+                     pcaperchr(genofile, chr = "5", pc2 = 3),
+                     pcaperchr(genofile, chr = "6", pc2 = 3),
+                     pcaperchr(genofile, chr = "7", pc2 = 3),
+                     ncol=4)
+ggsave(snakemake@output[[5]], plot=PaPCA12, width = 7, height = 15)
 # pdf("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/figures/PaPCA13.pdf", width = 15, height = 8)
-plot_grid(pcaperchr(genofile, chr = "1", pc2 = 3),
-          pcaperchr(genofile, chr = "2", pc2 = 3),
-          pcaperchr(genofile, chr = "3", pc2 = 3),
-          pcaperchr(genofile, chr = "4", pc2 = 3),
-          pcaperchr(genofile, chr = "5", pc2 = 3),
-          pcaperchr(genofile, chr = "6", pc2 = 3),
-          pcaperchr(genofile, chr = "7", pc2 = 3),
-          ncol=4)
-dev.off()
 
-pdf(snakemake@output[[6]], height=7, width=15)
+PaPCA23 <- plot_grid(pcaperchr(genofile, chr = "1", pc1 = 2, pc2 = 3),
+                     pcaperchr(genofile, chr = "2", pc1 = 2, pc2 = 3),
+                     pcaperchr(genofile, chr = "3", pc1 = 2, pc2 = 3),
+                     pcaperchr(genofile, chr = "4", pc1 = 2, pc2 = 3),
+                     pcaperchr(genofile, chr = "5", pc1 = 2, pc2 = 3),
+                     pcaperchr(genofile, chr = "6", pc1 = 2, pc2 = 3),
+                     pcaperchr(genofile, chr = "7", pc1 = 2, pc2 = 3),
+                     ncol=4)
+ggsave(snakemake@output[[6]], plot=PaPCA12, width = 7, height = 15)
 # pdf("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/figures/PaPCA23.pdf", width = 15, height = 8)
-plot_grid(pcaperchr(genofile, chr = "1", pc1 = 2, pc2 = 3),
-          pcaperchr(genofile, chr = "2", pc1 = 2, pc2 = 3),
-          pcaperchr(genofile, chr = "3", pc1 = 2, pc2 = 3),
-          pcaperchr(genofile, chr = "4", pc1 = 2, pc2 = 3),
-          pcaperchr(genofile, chr = "5", pc1 = 2, pc2 = 3),
-          pcaperchr(genofile, chr = "6", pc1 = 2, pc2 = 3),
-          pcaperchr(genofile, chr = "7", pc1 = 2, pc2 = 3),
-          ncol=4)
-dev.off()
 
 # ============================
 # PCoA of mating data and PCA of chr5
@@ -365,7 +360,6 @@ chr5withline <- pcaperchr(genofile, chr = "5") +
 pdf(snakemake@output[[7]], width = 11, height = 5)
 # pdf("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/Figures/Fig2_MatingVsSNPs.pdf", width = 11, height = 5)
 plot_grid(matingplot, NULL, chr5withline, ncol = 3, align = "h", rel_widths = c(2,0.1,2)) # This allows me to increase the space between plots
-# multiplot(matingplot, chr5withline, cols=2)
 dev.off()
 
 ### Who are the hybrids in chromosome 5?
@@ -374,4 +368,14 @@ chr5pca <- chr5pcaplot$data[[1]]
 hybridindex <- subset(chr5pca,x > -0.05 & x < 0) %>% rownames %>% as.numeric()
 cat("The het-v haplotype recombinant samples are: ", samples[hybridindex])
 
+# ============================
+## Put them all together for Figure S4
+# ============================
+
+figureS4 <- plot_grid(PCAallgenome, PaPCA12, PaPCA13, PaPCA23, ncol = 1, labels = c('A', 'B', 'C', 'D'), rel_heights = c(0.6, 1,1,1), label_size = 20)
+
+ggsave(snakemake@output[[8]], plot=figureS4, width = 11, height = 21)
+# ggsave("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/Figures/FigS4_PCAs.pdf", plot=figureS4, width = 11, height = 21)
+
+# ============================
 print("DONE!", quote=FALSE)
