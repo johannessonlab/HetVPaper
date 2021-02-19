@@ -212,7 +212,7 @@ plot_row <- plot_grid(allsnppca12, allsnppca13, ncol=2)
 title <- ggdraw() + draw_label("Whole genome SNP data", size = 20)
 PCAallgenome <- plot_grid(title, plot_row,  ncol = 1, rel_heights = c(0.1, 1) )
 
-ggsave(snakemake@output[[2]], plot=PCAallgenome, width = 5, height = 10)
+ggsave(snakemake@output[[2]], plot=PCAallgenome, width = 7, height = 4)
 # ggsave("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/figures/FigS4_PaPCA_all.pdf", plot=PCAallgenome, width = 5, height = 10)
 
 
@@ -325,7 +325,7 @@ PaPCA12 <- plot_grid(pcaperchr(genofile, chr = "1"),
                      pcaperchr(genofile, chr = "6"),
                      pcaperchr(genofile, chr = "7"),
                      ncol=4)
-ggsave(snakemake@output[[4]], plot=PaPCA12, width = 7, height = 15)
+ggsave(snakemake@output[[4]], plot=PaPCA12, width = 13, height = 7)
 # pdf("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/figures/PaPCA12.pdf", width = 15, height = 8)
 
 PaPCA13 <- plot_grid(pcaperchr(genofile, chr = "1", pc2 = 3),
@@ -336,7 +336,7 @@ PaPCA13 <- plot_grid(pcaperchr(genofile, chr = "1", pc2 = 3),
                      pcaperchr(genofile, chr = "6", pc2 = 3),
                      pcaperchr(genofile, chr = "7", pc2 = 3),
                      ncol=4)
-ggsave(snakemake@output[[5]], plot=PaPCA12, width = 7, height = 15)
+ggsave(snakemake@output[[5]], plot=PaPCA12, width = 13, height = 7)
 # pdf("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/figures/PaPCA13.pdf", width = 15, height = 8)
 
 PaPCA23 <- plot_grid(pcaperchr(genofile, chr = "1", pc1 = 2, pc2 = 3),
@@ -347,7 +347,7 @@ PaPCA23 <- plot_grid(pcaperchr(genofile, chr = "1", pc1 = 2, pc2 = 3),
                      pcaperchr(genofile, chr = "6", pc1 = 2, pc2 = 3),
                      pcaperchr(genofile, chr = "7", pc1 = 2, pc2 = 3),
                      ncol=4)
-ggsave(snakemake@output[[6]], plot=PaPCA12, width = 7, height = 15)
+ggsave(snakemake@output[[6]], plot=PaPCA12, width = 13, height = 7)
 # pdf("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/figures/PaPCA23.pdf", width = 15, height = 8)
 
 # ============================
