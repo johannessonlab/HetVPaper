@@ -3,7 +3,7 @@
 This pipeline is meant to be run using the vcf file with no missing data produced by `SNPpop.smk`. The output are:
 
 - LD decay per chromosome of the entire Wageningen Collection (Figure S3 in the paper), plus some extras 
-- LD heatmap-like plot inspired in [Hench et al. (2019)](https://www.nature.com/articles/s41559-019-0814-5) (Figure S8)
+- LD heatmap-like plot inspired by [Hench et al. (2019)](https://www.nature.com/articles/s41559-019-0814-5) (Figure S10)
 
 In the code, I ofter refer to the "V" and "A" mating groups. These are equivalent to the V and V1 alleles of *het-v*.
 
@@ -39,7 +39,7 @@ dependencies:
   - htslib=1.9
 ```
 
-The pipeline also depends on a small yaml that act as local conda rules.
+The pipeline also depends on a small yaml for the R environment. This one has to be present for the pipeline to run (using `--use-conda`).
 
     $ cat envs/PaLDPlot.yaml
 ```yaml
@@ -72,7 +72,6 @@ For testing:
 Run the pipeline:
 
     $ screen -R PaLD
-    # Important to activate environment!!
     $ conda activate PaLD
     $ snakemake --snakefile PaLD.smk --configfile PaLD_config.yaml -p --cluster "sbatch -A snicXXXX-X-XXX -p core -n {params.threads} -t {params.time} --mail-user xxxxxxxxxxxx@xxxxx.xx --mail-type=ALL" -j 20 --keep-going --use-conda &> PaLD.log &
 
