@@ -18,10 +18,11 @@ library(reshape2) # for melt
 # Reading the data
 # ============================
 
-hetrecord <- read.csv("../data/PaAllelesPaper.csv", header = TRUE, na.strings = "NA", sep=",")
-sampling2017 <- read.csv("../data/Sampling2017_20191126.csv", head = TRUE, na.strings = "NA", sep=",")
-names(sampling2017) <- c("Dung", "Sample", "Herbivore", "Total", "A", "V", "comata")
-sampling2017 <- sampling2017 %>% select(-c(Sample, Total, Herbivore))
+hetrecord <- read.csv("../data/PaAllelesPaper.csv", header = TRUE, na.strings = "NA", sep=",") # Replace the path, as the relative paths won't work
+sampling2017 <- read.csv("../data/Sampling2017_20220422.csv", head = TRUE, na.strings = "NA", sep=",") # Replace the path, as the relative paths won't work
+sampling2017 <- sampling2017 %>% filter(Indiv_count != "-" & Mating_phenotype != "P. comata") %>% select(c(Wa_numbers, Mating_phenotype, Dung, Indiv_count))
+sampling2017 <- sampling2017[!(is.na(sampling2017$Mating_phenotype)), ]  # Remove columns without phenotype data
+
 
 # ============================
 # Are there differences in substrate?
@@ -34,6 +35,11 @@ cat(paste("We have substrate data for a total of", herbiabundance$value %>% sum,
 cat("Is this significant?")
 cat("(We ignored sheep due to low sample sizes)")
 chisq.test(countherbis[,1:2]) # Not significant p-value = 0.4959
+# There is no pattern of a particular het-v allele associating with a specific herbivore (Horse or Rabbit)
+
+# What about individually? null hypothesis that they are equally distributed
+chisq.test(countherbis[,1]) # p-value = 0.8886 for Horse
+chisq.test(countherbis[,2]) # p-value = 0.2087 for Rabbit
 
 # Plot
 substrateplot <- ggplot(herbiabundance, aes(fill=Het.v, x=Herbivore, y=value)) + 
@@ -50,15 +56,15 @@ ggsave(plot = substrateplot, "../results/figures/Fig6B.pdf", width = 2.5, height
 # ============================
 # Do they co-exist in the same dung piece?
 # ============================
-dungs <- sampling2017 %>% melt(id = c("Dung")) %>% filter(variable != "comata")
+dungs <- with(sampling2017 , table(Dung, Mating_phenotype)) %>% melt(id = c("Dung"))
 names(dungs) <- c("Dung", "Group", "Count")
 
 dungplot <- ggplot(dungs, aes(fill=Group, x=as.factor(Dung), y=Count)) + 
   geom_bar(position="stack", stat="identity") +
   theme_cowplot() +
   xlab("Dung sample") + ggtitle("2017") + 
-  theme(axis.title.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
-  scale_fill_manual(values= c("darkseagreen3", "#B66DE9", "gray"), # "darkseagreen3", "darkslategray"
-                    name = "Group", labels = c("V1", "V", "Unknown")) # , "comata"
+  theme(axis.title.y = element_blank(), plot.title = element_text(hjust = 0.5), legend.position = c(.9, .65)) +
+  scale_fill_manual(values= c("#B66DE9","darkseagreen3", "gray"), name = "Inferred\n Group", 
+                    labels= c("rV", "RV1"))
 
-ggsave(plot = dungplot, "./results/figures/Fig6C.pdf", width = 9, height = 3)
+ggsave(plot = dungplot, "./results/figures/Fig4C.pdf", width = 8.2, height = 3)
