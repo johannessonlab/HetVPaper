@@ -1,0 +1,242 @@
+// DIKARYOTIC MODEL
+//to model the complex life-cycle of podospora, two populations are set up that represent the diploid zygote stage and the dikaryotic stage.
+
+
+//#########################
+// Init: define parameters and rates that are valid for the whole simulation
+//########################
+initialize() {
+	// defining some parameter values.
+	//population size
+	defineConstant("popsize",1000);
+	//parameters for fitness callbacks
+	defineConstant("wmax",0.5);
+	defineConstant("slope",12);
+	defineConstant("w50",0.5);
+	//selfing rates and other parameters that may be defined from the R script
+	//defineConstant("wmax2",1);
+	//defineConstant("selfing1",0.0);
+	//defineConstant("selfing2",0.70);
+	//defineConstant("prezygV",0.5);
+	//defineConstant("rep",0);
+	//defineConstant("samplerate",20);
+	
+	// m1 mutations are neutral mutations that accumulate over time.
+	initializeMutationType("m1", 0.5, "f", 0.0);//name, dominance, "fixed" sel coef, value of sel=0.
+	m1.color="yellow"; //those neutral mutations will show up yellow on the map
+	
+	//the m2 mutation represents the "r" allele of het r, of which R is the wild 	type. r is recesive.
+	initializeMutationType("m2", 0.1, "f", 0.0);
+	m2.convertToSubstitution=F; //the mutation doesnt disappear after reaching fixation (which would be the default behavior of Slim). This is important because of epistatic fitness effects.
+	m2.mutationStackPolicy="f"; // Once R mutates to r, it cannot mutate further, hence the stack policy is "f" for keep first mutation at the site.
+	m2.color="red"; // the R->r mutation will show up as red on the display.
+	
+	//the m3 mutation will represent the V state of het-V, of which V1 is the wild type. We assume V as no direct fitness effect (epistasis and frequency dependence will be defined later on).
+	initializeMutationType("m3", 0.5, "f", 0);
+	m3.convertToSubstitution=F;
+	m3.mutationStackPolicy="f";
+	m3.color="red";
+	
+	//We need to set several types of genomic elements. The two loci of het-r and het-V will 	be genomic elements g2 and g3, so they have the same number as their mutation. g1 will be the rest of the chromosomes.
+	// g1 genomic element type: uses m1 for all new mutations
+	initializeGenomicElementType("g1", m1, 1.0);
+	//g2 is where het-r is, which can mutate to from R to r
+	initializeGenomicElementType("g2",m2,1.0);
+	//g2 is the locus of het-V, which can be V or V1.
+	initializeGenomicElementType("g3",m3,1.0);
+	g3.color="green";
+	
+	//I build my genome by placing the two loci for het-r and het-v (g2,g3) whithin 	a 100kb genomic region.
+	
+	//initializeGenomicElement(g1, 0,9999);
+	initializeGenomicElement(g2, 10000,10000);
+	//initializeGenomicElement(g1, 10001,89999);
+	initializeGenomicElement(g3, 90000,90000);
+	//initializeGenomicElement(g1, 90001,99999);
+	//I divide up my genome into two chromosomes of size 50kb each by introducing 0.5 reco rate in the middle of the 100kb genomic element.
+	initializeRecombinationRate(c(1e-8,0.5,1e-8),c(49999,50000,99999));
+	
+	//The mutation rate will depend on the position on the genome (following genomic elements), so the mutation rate of g1, for neutral markers of type m1, will be 10-7 per base per generation, of g2 (R->r) will have to be high for that mutation to be ocurring regularly in a reasonably sized population. Similar for g3.
+	initializeMutationRate(c(1e-7,0,1e-7,0,1e-7),c(9999,10000,89999,90000,99999));
+
+}
+
+//###################
+// Callbacks: here we define recombination, fitness effects and specific rules for offspring formation for each "population"(=life cycle stage)
+//###################
+
+//Between p2 and p1, between the dikaryotic stage and the next diploid zygote, there is no recombination or chromosome sorting. To model this we use a recombination callback to supress recombination in population p2.
+recombination (p2) { breakpoints=c(0);	return T;}
+
+//fitness effects will only apply to dikaryons (population p2) and not to the short-lived diploid zygotes (p1). For that reason we define population specific fitness callbacks.
+//The fitness of m2 mutation (het-R, r). The lethal conbination V-R does not need to be defined as it already is from the fitness callback of m3. All that's needed is the benefit of vegetative incompatibility that is dependent on the frequency of V. R gets a positive effect from vegetative incompatibility with, V, dependent on the frequency of V. For simplicity of the simulation however, this will be defined as a negative fitness effect on r (easier because r is already defined as a mutation, R being the wildtype).
+fitness (m2,p2)
+{	if (homozygous)
+		return relFitness- wmax*(1/(1+exp(-slope*((sum(sim.mutationFrequencies(p2,sim.mutationsOfType(m3))))-w50)))) ;
+	else
+		return relFitness;
+}
+
+//fitness of m3 (Het-V,V).
+fitness(m3,p2)
+{	if (genome1.countOfMutationsOfType(m2)==0) //if the haploid genome carrying V (m3) doesn't have r (m2) then....
+		return 0.0; // its fitness is zero
+	else
+		return relFitness + wmax*(1/(1+exp(-slope*((1-sum(sim.mutationFrequencies(p2,sim.mutationsOfType(m2))))-w50))))+ wmax2*(-(1/(1+exp(-slope*(sum(sim.mutationFrequencies(p2,sim.mutationsOfType(m3)))-0.5))))+1/2)  ; // the second part is the negative frequency dependence of V and V1. The first part represents the benefit of vegetative incompatibility with R. Paramter values are defined in the init phase.
+}
+
+//Modifychild callbacks for VR lethality, in p1 (dikaryons are offspring of the zygotes so offspring rules of p1 apply) and pre-zygotic isolation in p2 (zygotes are offspring of the dikaryon stage, so offspring rules of p2 apply).
+
+modifyChild(p1) { //here I define rules for the dikaryons that make it or not, depending on the V-R interaction. 
+	
+	childgenome1isVR= all(c(childGenome1.countOfMutationsOfType(m3)>0,childGenome1.countOfMutationsOfType(m2)==0));
+	childgenome2isVR= all(c(childGenome2.countOfMutationsOfType(m3)>0,childGenome2.countOfMutationsOfType(m2)==0));
+	childg1V1R= all(c(childGenome1.countOfMutationsOfType(m3)==0,childGenome1.countOfMutationsOfType(m2)==0));
+	childg2V1R= all(c(childGenome2.countOfMutationsOfType(m3)==0,childGenome2.countOfMutationsOfType(m2)==0));
+	childg1Vr= all(c(childGenome1.countOfMutationsOfType(m3)==1,childGenome1.countOfMutationsOfType(m2)==1));
+	childg2Vr= all(c(childGenome2.countOfMutationsOfType(m3)==1,childGenome2.countOfMutationsOfType(m2)==1));
+	childg1V1r= all(c(childGenome1.countOfMutationsOfType(m3)==0,childGenome1.countOfMutationsOfType(m2)==1));
+	childg2V1r= all(c(childGenome2.countOfMutationsOfType(m3)==0,childGenome2.countOfMutationsOfType(m2)==1));
+	
+	mutr=sim.mutationsOfType(m2);
+	mutV=sim.mutationsOfType(m3);
+	
+	if(childgenome1isVR & childgenome2isVR) //if child is VR/VR...
+		return F; //...then the child isn't created, it is dead.
+	if (childgenome1isVR & !childgenome2isVR) //one genome of the child is VR...
+		if (runif(1)<0.5) //50% survival. this is a trick to model monokaryons
+			return F;
+		else
+		{if (childg2Vr) //if the other genome is Vr
+				childGenome1.addNewDrawnMutation(m2,10000) ; // add a r mutation to the first genome to convert it to Vr
+			if (childg2V1R) //if the other genome is V1R
+				childGenome1.removeMutations(mutV); //remove V to convert VR genome to V1R
+			if (childg2V1r) //if the other genome is V1r
+				childGenome1.removeMutations(mutV);
+			childGenome1.addNewDrawnMutation(m2,10000); //convert VR into V1r.
+		}
+	
+	if (!childgenome1isVR & childgenome2isVR) //second genome of the child is VR...
+		if (runif(1)<0.5) //50% survival. this is a trick to model monokaryons
+			return F;
+		else
+		{if (childg1Vr) //if the other genome is Vr
+				childGenome2.addNewDrawnMutation(m2,10000) ; // add a r mutation to the first genome to convert it to Vr
+			if (childg1V1R) //if the other genome is V1R
+				childGenome2.removeMutations(mutV); //remove V to convert VR genome to V1R
+			if (childg1V1r) //if the other genome is V1r
+				childGenome2.removeMutations(mutV);
+			childGenome2.addNewDrawnMutation(m2,10000); //convert VR into V1r.
+		}
+	
+	if (childg1V1R & childg2Vr) //make a Vr mono
+		if (runif(1)<0.5)
+			return F;
+		else
+		{childGenome1.addNewDrawnMutation(m3,90000);
+			childGenome1.addNewDrawnMutation(m2,10000);} //
+	
+	if (childg2V1R & childg1Vr) //make a Vr mono
+		if (runif(1)<0.5)
+			return F;
+		else
+		{childGenome2.addNewDrawnMutation(m3,90000);
+			childGenome2.addNewDrawnMutation(m2,10000);}
+	return T;
+
+}
+
+//here I set the rule of prezygotic isolation, for the formation of zygotes of p1. The rules belong to p2 because this is where the zygotes, before migration to p1.
+modifyChild(p2) {
+	childg1V1R= all(c(childGenome1.countOfMutationsOfType(m3)==0,childGenome1.countOfMutationsOfType(m2)==0));
+	childg2V1R= all(c(childGenome2.countOfMutationsOfType(m3)==0,childGenome2.countOfMutationsOfType(m2)==0));
+	childg1Vr= all(c(childGenome1.countOfMutationsOfType(m3)==1,childGenome1.countOfMutationsOfType(m2)==1));
+	childg2Vr= all(c(childGenome2.countOfMutationsOfType(m3)==1,childGenome2.countOfMutationsOfType(m2)==1));
+	childg1V1r= all(c(childGenome1.countOfMutationsOfType(m3)==0,childGenome1.countOfMutationsOfType(m2)==1));
+	childg2V1r= all(c(childGenome2.countOfMutationsOfType(m3)==0,childGenome2.countOfMutationsOfType(m2)==1));
+	if (childg1V1R & childg2Vr)
+		if (runif(1)<(0.4+prezygV))
+			return F; //drop in fertility for this parental combination.
+	if (childg2V1R & childg1Vr)
+		if (runif(1)<(0.4+prezygV))
+			return F; //reciprocal cross from previous.
+	if (childg1Vr & childg2V1r)
+		if (runif(1)<prezygV)
+			return F; //50% drop in fertility for this parental combination
+	if (childg2Vr & childg1V1r)
+		if (runif(1)<prezygV)
+			return F; //reciprocal cross from just above.
+	return T; //other combinations are just fine!
+}
+
+1 {
+	//we use two populations to simulate the complicated life cycle of Podospora
+	sim.addSubpop("p1", popsize); //p1 contains the diploids (zygotes)
+	sim.addSubpop("p2",popsize); //p2 contains the dikaryons
+	p1.setMigrationRates(p2,1.0); //each generation, all the zygotes from p1 move to the dikaryotic stage in p2 and vice versa.
+	p2.setMigrationRates(p1,1.0);
+	p1.setSelfingRate(1); //not the real selfing rate, represents transition between diploid and dikaryotic stage, needs to be 1.
+	p2.setSelfingRate(selfing1);
+
+}
+
+2{print(c("Gen","V1R","Vr","V1r","VR")); // headers for the output window
+	sim.setValue("tableA","");
+	sim.setValue("tableB","");
+} //same headers for the two output files. There are two output files because the model runs a two stage life cycle mimicked by two populations, so effectively it is running two parallel simulations that I call A and B, the population that starts as p1 and the one that starts as p2.
+
+//from start to .... this will record the frequency of genotypes every ... gen.
+2:1501{  if (sim.generation % samplerate == 0) //even generations, deals with population A
+	{gens=sample(p2.genomes,(popsize*2));
+		VR=0.0;
+		Vr=0.0;
+		V1R=0.0;
+		V1r=0.0;
+		for (i in 0:(2*popsize-1))
+			if (gens[i].containsMarkerMutation(m2,10000))
+				if (gens[i].containsMarkerMutation(m3,90000)) Vr=Vr+1.0;
+				else V1r=V1r+1.0;
+			else
+				if (gens[i].containsMarkerMutation(m3,90000)) VR=VR+1.0;
+			else V1R=V1R+1.0;
+		print(c(sim.generation,V1R/(popsize*2),Vr/(popsize*2),V1r/(popsize*2),VR/(popsize*2)));
+		sim.setValue("tableA",sim.getValue("tableA")+paste(c("A ",wmax2," ",prezygV," ",selfing2," ",rep," ",sim.generation," ",V1R/(popsize*2)," ",Vr/(popsize*2)," ",V1r/(popsize*2)," ",VR/(popsize*2),"\n"),""));};
+	
+	if ((sim.generation-1) % samplerate ==0 )
+	{gens=sample(p2.genomes,(popsize*2));
+		VR=0.0;
+		Vr=0.0;
+		V1R=0.0;
+		V1r=0.0;
+		for (i in 0:(2*popsize-1))
+			if (gens[i].containsMarkerMutation(m2,10000))
+				if (gens[i].containsMarkerMutation(m3,90000)) Vr=Vr+1.0;
+				else V1r=V1r+1.0;
+			else
+				if (gens[i].containsMarkerMutation(m3,90000)) VR=VR+1.0;
+			else V1R=V1R+1.0;
+		print(c(sim.generation,V1R/(popsize*2),Vr/(popsize*2),V1r/(popsize*2),VR/(popsize*2)));
+		sim.setValue("tableB",sim.getValue("tableB")+paste(c("B ",wmax2," ",prezygV," ",selfing2," ",rep," ",sim.generation," ",V1R/(popsize*2)," ",Vr/(popsize*2)," ",V1r/(popsize*2)," ",VR/(popsize*2),"\n"),""));};
+}
+
+
+
+
+3:4 late(){target=sample(p1.genomes,2000);
+	target.addNewDrawnMutation(m2,10000);
+	target.addNewDrawnMutation(m3,90000);} //Make the whole population Vr
+500  {	p2.setSelfingRate(selfing2); }
+600:601 late(){target=sample(p1.genomes,20);
+	target.removeMutations(sim.mutationsOfType(m2));
+	target.removeMutations(sim.mutationsOfType(m3));} //artificially introducing 20 V1R genomes in the diploid pool
+1000  {	p2.setSelfingRate(selfing1); }
+
+
+1501 late() {
+	setwd("/Users/ivian/Desktop/SlimOuts");
+	writeFile(paste(c("output","_RUNS_V1R_inv_Vr",".txt"),""),sim.getValue("tableA"),append=T);
+	writeFile(paste(c("output","_RUNS_V1R_inv_Vr",".txt"),""),sim.getValue("tableB"),append=T);
+
+}
+// end of simulation
+//#################

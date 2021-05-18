@@ -13,5 +13,7 @@ As output of all the pipelines there is a `results` folder that usually contains
 
 I ran the pipelines in Uppsala University's supercomputer [UPPMAX](https://uppmax.uu.se/), which has a CentOS Linux operating system with a slurm scheduler. However, they should work fine also in other unix environments.
 
+---
 
+In addition to the bioinformatic pipelines, the folder `SLiMsimulations` contains the code and simulations using [SLiM 3](https://academic.oup.com/mbe/article/36/3/632/5229931) written by Ivain Martinossi.
   
