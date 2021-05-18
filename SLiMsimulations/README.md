@@ -1,6 +1,6 @@
-# SLiM and R code supporting individual-based simulations of "Allorecognition genes drive reproductive isolation in Podospora anserina"
+# SLiM and R code supporting individual-based simulations
 
-**by Ivain Martinossi**
+**By Ivain Martinossi**
 
 
 -------------------------------------------------------------------------------
