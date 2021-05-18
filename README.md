@@ -1,4 +1,4 @@
-# Scripts and pipelines for the hets paper
+# Scripts and pipelines for the het-v paper
 Scripts and Snakemake pipelines associated with the paper of Ament-Velásquez et al. "Allorecognition genes drive reproductive isolation in *Podospora anserina*", in preparation.
 
 There are three main [Snakemake](https://snakemake.readthedocs.io/en/stable/) pipelines. The first one, `SNPpop.smk`, must be run first. Some of the outputs are used by the other two pipelines. So, the order goes:
