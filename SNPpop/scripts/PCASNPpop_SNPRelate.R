@@ -75,6 +75,12 @@ pam_fit2 <- pam(d2, k=2)
 # podandm %>% colnames()
 # pam_fit2$clustering
 
+## --- Gap statistic ---
+set.seed(123)
+gap_stat <- clusGap(d2 %>% as.matrix(), FUN = pam, nstart = 25,
+                    K.max = 10, B = 500)
+plot(gap_stat, main = "clusGap(., FUN = pam, nstart=25, B= 500)")
+
 ### ----- Recalculate the PCoA -----
 ### Getting ammount of variance explained
 ## I got this from https://github.com/wilkox/doPCoA/blob/master/R/do_PCoA.R
