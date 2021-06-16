@@ -105,7 +105,7 @@ First, to get an idea of how the pipeline looks like we can make a rulegraph:
 
 For testing:
 
-    $ snakemake --snakefile DiversityStats.smk --configfile DiversityStats_config.yml -pn
+    $ snakemake --snakefile DiversityStats.smk --configfile DiversityStats_config.yml -pn
 
 Run the pipeline:
 
