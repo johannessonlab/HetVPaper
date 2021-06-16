@@ -42,9 +42,10 @@ FstConfIntvChr7 <- read.csv(snakemake@input[[14]], header = TRUE, sep=",")
 ## The het genes historical data
 hetrecord <- read.csv(snakemake@input[[15]], header = TRUE, na.strings = "NA", sep=",")
 hetrecord$Het.Z <- as.factor(hetrecord$Het.Z)
+hetrecord$Het.q <- as.factor(hetrecord$Het.q)
 
 # Rearrange for the genes
-alleledata <- melt(hetrecord %>% select(SampleID, Year, Het.v, Het.Z, Het.r_phen, Het.c, Het.c_phen, Het.s, SimpleID), id = c("SampleID", "Year"))
+alleledata <- melt(hetrecord %>% select(-c(Herbivore, Spok4, Spok2, Spok3, Pseudospok)), id = c("SampleID", "Year")) 
 names(alleledata)[3:4] <- c("Het", "Allele")
 
 PopDataChr5noHybrids <- read.csv(snakemake@input[[16]], header = TRUE, sep=",")
@@ -54,24 +55,24 @@ PopDataChr5noHybrids <- read.csv(snakemake@input[[16]], header = TRUE, sep=",")
 ## The coordinates of the genes, used by the plotting functions
 genesall <- data.frame(locus = c("Spok2", "MAT", rep("Centromere", 7), 
                                  "het-z", "het-r", "het-d", "het-s", "het-c", "nwd1", # Deskalov et al 2012: het-s is next to NWD2
-                                 "hnwd1", "het-e", "mod-A", "het-V", "nwd3", "idi-2",
-                                 "hnwd3", "Spok3/4", "Spok3/4", "Spok3/4"),
+                                 "hnwd1", "het-e", "mod-A", "het-v", "nwd3", "idi-2",
+                                 "hnwd3", "het-q", "Spok3/4", "Spok3/4", "Spok3/4"),
                        position = c(1094363, 7345878.5, 4479205, 236468.5, 675115.5, 1236388.5, 2062808.5, 238150, 3562141.5,
                                     3957511.5, 2683360.5, 3056777, 208504, 495416,  3983565.5,
                                     436378.5, 691354.5, 1568320, 1294132.5, 1392335, 1641319,
-                                    712318.5, 355881, 3328395.5, 900387.5),
+                                    712318.5, 3242172, 355881, 3328395.5, 900387.5),
                        chr = c("chromosome_5", "chromosome_1","chromosome_1", "chromosome_2", "chromosome_3", "chromosome_4", "chromosome_5", "chromosome_6", "chromosome_7",
                                "chromosome_1", "chromosome_2", "chromosome_2", "chromosome_3", "chromosome_3", "chromosome_3",
                                "chromosome_4", "chromosome_4", "chromosome_4", "chromosome_5", "chromosome_5", "chromosome_5",
-                               "chromosome_7", "chromosome_3", "chromosome_5", "chromosome_5"),
+                               "chromosome_7", "chromosome_7", "chromosome_3", "chromosome_5", "chromosome_5"),
                        infig = c(1,1,1,1,1,1,1,1,1,  # Use this to filter out loci
                                  1,1,1,1,1,0,
                                  1,1,0,1,0,0,
-                                 1,1,1,1),
+                                 1,1,1,1,1),
                        shapes = c(10, 15, rep(19,7), 
                                   17, 24, 4, 5, 6, 8,
                                   12, 18, 13, 25, 2, 11,
-                                  9, 1, 1, 1),
+                                  9, 20, 1, 1, 1),
                        value = 0)
 
 genes <- genesall %>% filter(infig == 1)
@@ -101,6 +102,7 @@ allpitajima <- function(PopData, thischr = "chromosome_5", thistitle = "Chromoso
           axis.text = element_text(size = rel(1)),
           legend.key=element_blank(),
           legend.title=element_blank(),
+          legend.key.height=unit(0.8,"line"), # Make the items *within* a legend closer to each other
           legend.text=element_text(size=rel(0.9)),
           legend.position=c(0.94, 0.56),
           legend.spacing.y = unit(0.005, 'cm'), # Put the items of the legend closer to each other
@@ -108,7 +110,7 @@ allpitajima <- function(PopData, thischr = "chromosome_5", thistitle = "Chromoso
     scale_color_manual(values= c("firebrick1", "blue4"), labels=c(expression(pi["  "]), expression(theta["W"])) , guide=legend) + # The space in pi is to center it better...
     ylim(0, round(maxPi,digits=2)) +
     geom_line(alpha = 0.7) + 
-    geom_point(data = genes %>% filter(chr == thischr) %>% filter(locus != "nwd3"), aes(x = position, shape = locus, fill = locus), colour = "black", size = 3) + guides(fill=FALSE) + # %>% filter(locus != "het-V") 
+    geom_point(data = genes %>% filter(chr == thischr) %>% filter(locus != "nwd3"), aes(x = position, shape = locus, fill = locus), colour = "black", size = 3) + # guides(fill=FALSE) + # %>% filter(locus != "het-V")
     # scale_shape_manual(values=c(19, 2, 5, 1, 17, 23))
     scale_shape_manual(values= genes[order(genes$locus),] %>% filter(chr == thischr) %>% filter(locus != "nwd3") %>% .$shapes) # Give it specific shapes (but re-order the dataframe so it maches) #  %>% filter(locus != "het-V")
   
@@ -178,11 +180,11 @@ hetintime <- function(hetcounts, legend = FALSE, title = "Het-z"){
     xlab("Year") + labs(title = title) +
     # theme(plot.title = element_text(size = rel(1.5), face="bold.italic", family = "Helvetica", hjust = 0.5)) + # I lose control if I use theme_cowplot()
     geom_point(aes(x = year, size = Freq), show.legend = legend) +
-    scale_size_continuous(breaks = c(0,5,10,15)) + # Fix the legend circle size
+    scale_size_continuous(breaks = c(0,5,10,15,20), limits = c(0, 20)) + # Fix the legend circle size
     guides(size=guide_legend(title="Sample\nsize")) +
     geom_line(aes(linetype = Allele)) +
     ylim(0,1) +
-    scale_size_area() + # ensures that a value of 0 is mapped to a size of 0
+    # scale_size_area() + # ensures that a value of 0 is mapped to a size of 0, but it interferes with the forced breaks 
     theme_cowplot() + # simple cowplot theme
     background_grid() # always place this after the theme
   return(hetplot)
@@ -206,6 +208,7 @@ fst.plotter <- function(PopData, FstConfIntv, thistitle = "Chromosome 2", thisch
           axis.title.x=element_blank(),
           axis.text = element_text(size = rel(1)),
           legend.key=element_blank(), # remove background of the key in the legend
+          legend.key.height=unit(0.8,"line"), # Make the items *within* a legend closer to each other
           legend.title=element_blank(),
           legend.text=element_text(size=rel(0.9)),
           legend.position=c(0.9, 0.56),
@@ -304,6 +307,7 @@ PopDataChr7plots <- allpitajima(PopDataChr7, thischr = "chromosome_7", thistitle
 hetZcounts <- cbind(yearlycounts(alleledata %>% filter(Het == "Het.Z")), Het = "Het.Z")
 hetCcounts <- cbind(yearlycounts(alleledata %>% filter(Het == "Het.c_phen")), Het = "Het.c_phen")
 hetScounts <- cbind(yearlycounts(alleledata %>% filter(Het == "Het.s")), Het = "Het.s")
+hetQcounts <- cbind(yearlycounts(alleledata %>% filter(Het == "Het.q")), Het = "Het.q") 
 
 # Rename the S alelles
 hetScounts$Allele <- hetScounts$Allele %>% gsub("Big_S", "S", .) %>% gsub("small_s", "s", .) %>% as.factor()
@@ -312,9 +316,14 @@ hetScounts$Allele <- hetScounts$Allele %>% gsub("Big_S", "S", .) %>% gsub("small
 hetz <- hetintime(hetZcounts, legend = TRUE, title = substitute(paste(italic('Het-z'), " (chromosome 1)")))
 hetc <- hetintime(hetCcounts, title = substitute(paste(italic('Het-c'), " (chromosome 3)")))
 hets <- hetintime(hetScounts, title = substitute(paste(italic('Het-s'), " (chromosome 3)")))
+hetq <- hetintime(hetQcounts, legend = TRUE, title = substitute(paste(italic('Het-q'), " (chromosome 7)")))
 
 # Put them together in a single object, aligned to each other (important to deal with the legend)
 hetplots <- plot_grid(hetz, hetc, hets, ncol = 1, align = "v")
+
+# Just het-q
+print("Plotting het-q alone ...")
+ggsave(snakemake@output$hetq, plot = hetq, width = 13, height = 9, units = "cm")
 
 ## ----- Just chromosome 1 and 3 in the main figure (MAIN FIGURE) -----
 diversitystats2 <- plot_grid(PopDataChr1plots,
@@ -371,54 +380,69 @@ genotypesplot <- hetintime(yearlycounts(genotypes), legend = TRUE, title = subst
 ggsave(snakemake@output$hetrvtime, width = 5, height = 4)
 
 # -----------
-###### Goodness-of-fit
-# Are these observation significant?
-# The problem with usin Fisher exact test is that it's expecting a 2x2 table, and we know that one genotype is Lethal.
-matrixVR<- with(hetrecord %>% select(Het.v,Het.r_phen) %>% na.omit(), table(Het.v, Het.r_phen)) %>% as.matrix
-fisher.test(matrixVR, alternative = "two.sided") # p-value < 2.2e-16 # Table produces some weird extra columns with the column names...
-
-matrixVZ<- with(hetrecord %>% select(Het.v, Het.Z) %>% na.omit(), table(Het.v, Het.Z)) %>% as.matrix
-fisher.test(matrixVZ, alternative = "two.sided")
-
-matrixVS <- with(hetrecord %>% select(Het.v, Het.s) %>% na.omit(), table(Het.v, Het.s)) %>% as.matrix
-fisher.test(matrixVS, alternative = "two.sided")
-
-## But we only have 3 possible genotypes with V-R
-chisq.test(matrixVR) # p-value < 2.2e-16
-
-#### Let's use a chi-square but assuming HW as the expected count
-# Calculate the frequencies of alleles (counting from the matrix ensures that rows with NAs are not counted)
-vr <- c(Vr = matrixVR[3], V1r = matrixVR[4], V1R = matrixVR[2])
-freqr <- (vr['Vr'] + vr['V1r'])/ sum(vr)
-freqR <- vr['V1R']/ sum(vr)
-freqV <- vr['Vr']/ sum(vr)
-freqV1 <- (vr['V1R'] + vr['V1r'])/ sum(vr)
-
-# Since VR is letal, that combination is lost
-hwp <- c(freqV*freqr, freqV1*freqr, freqV1*freqR)
-
-# *** Is it significant? ***
-chisq.test(vr, p = hwp/sum(hwp)) # p-value = 2.336e-11
-chisq.test(vr, p = hwp/sum(hwp))$expected #expected values
-# With p-value computed with a Monte Carlo test (Hope, 1968) with B replicates
-chisq.test(vr, p = hwp/sum(hwp), simulate.p.value=TRUE,B=10000) #  p-value = 9.999e-05
-
-# Make a function for the HW expectations
-chisqmyhet <- function(genotypematrix){
-  # A is columns, B is rows
-  freqA <- sum(genotypematrix[1,])/sum(genotypematrix) #V
-  freqa <- sum(genotypematrix[2,])/sum(genotypematrix) #V1
-  freqB <- sum(genotypematrix[,1])/sum(genotypematrix) #S
-  freqb <- sum(genotypematrix[,2])/sum(genotypematrix) #s
-  
-  # Expected frequencies under Hardy-Weinberg
-  p <- c(freqA*freqB, freqa*freqB, freqA*freqb, freqa*freqb)
-  
-  return(chisq.test(as.vector(genotypematrix), p = p))
+# --- Calculate r2 between het genes ---
+# Let's quantify the degree of gametic disequlibrium between the alelles of different het genes, using
+# the square of the correlation of gene frequencies r2 (Hill & Robertson 1968).
+# For this, I got inspired by the functions of the `genetics` package
+print("Calculating LD between het-v and other het genes ...")
+# Make a vector of presence absence of the allele of interest
+haploallele.count <-function(gtps, allelo) {
+  retval <- (gtps == allelo) %>% as.numeric() # Assume biallelic sites
+  return(retval)
 }
 
-chisqmyhet(matrixVZ) # p-value = 0.9236 
-chisqmyhet(matrixVS) # p-value = 0.09431
+haploidLD <- function (g1, g2) # Except g1 and g2 are not genetics::genotype() objects
+{
+  # Remove individuals with missing data
+  bothgenes <- cbind.data.frame(g1,g2) %>% na.omit() %>% data.frame() # I had to use cbind.data.frame to avoid convertion of the factors to numeric
+  # Calculate allele frequencies
+  count.A <- bothgenes$g1 %>% table
+  count.B <- bothgenes$g2 %>% table
+  prop.A <- count.A/sum(count.A)
+  prop.B <- count.B/sum(count.B)
+  major.A <- names(prop.A)[which.max(prop.A)]
+  major.B <- names(prop.B)[which.max(prop.B)]
+  pA <- max(prop.A, na.rm = TRUE)
+  pB <- max(prop.B, na.rm = TRUE)
+  pa <- 1 - pA
+  pb <- 1 - pB
+  Dmin <- max(-pA * pB, -pa * pb) # for negative values of D (see Lewontin 1988)
+  pmin <- pA * pB + Dmin
+  Dmax <- min(pA * pb, pB * pa) # for positive values of D (see Lewontin 1988)
+  pmax <- pA * pB + Dmax
+  counts <- table(haploallele.count(g1, major.A), haploallele.count(g2, major.B))
+  freqs <- counts/sum(counts)
+  # The original LD.genotype function has a ML estimation equation because it 
+  # doesn't know the phasing of the alleles in heterozygous. But this is haploid 
+  # data, so we know. 
+  # see https://cran.r-project.org/web/packages/genetics/genetics.pdf in page 25
+  
+  estD <- freqs[1,1]*freqs[2,2] - freqs[1,2]*freqs[2,1]
+  if (estD > 0) estDp <- estD/Dmax else estDp <- estD/Dmin
+  n <- sum(counts)
+  corr <- estD/sqrt(pA * pB * pa * pb) # sensu Hill & Robertson (1968); this is r, so I need to get r2 by r^2
+  dchi <- (2 * n * estD^2)/(pA * pa * pB * pb) # see Lewontin 1988 for the Chi2 test of association
+  dpval <- 1 - pchisq(dchi, 1)
+  
+  retval <- data.frame(D = estD, `D'` = estDp, 
+                       r = corr, `R^2` = corr^2, n = n, `X^2` = dchi, `P-value` = dpval)
+  return(retval)
+  
+  # # This totally depends on the genetics package
+  # retval <- list(call = match.call(), D = estD, `D'` = estDp, 
+  #                r = corr, `R^2` = corr^2, n = n, `X^2` = dchi, `P-value` = dpval)
+  # class(retval) <- "LD"
+  # retval
+  #print(corr^2)
+}
+
+# Results
+cbind(het = c("het-r", "het-z", "het-q", "het-s"), 
+      rbind(haploidLD(hetrecord$Het.v, hetrecord$Het.r_phen), 
+            haploidLD(hetrecord$Het.v, hetrecord$Het.Z), 
+            haploidLD(hetrecord$Het.v, hetrecord$Het.q), 
+            #haploidLD(hetrecord$Het.v, hetrecord$Het.b), 
+            haploidLD(hetrecord$Het.v, hetrecord$Het.s)))
 
 # ============================
 ### ------ Plotting Fst values -----
@@ -521,3 +545,91 @@ highTajima <- rbind(cbind(chr = "chromosome_1", PopDataChr1 %>% filter(variable 
                     cbind(chr = "chromosome_6", PopDataChr6 %>% filter(variable == "Tajima" & value >= 2)))
 
 write.csv(highTajima, file=snakemake@output$tajimatable) # Write the table somewhere in case I need it
+
+# ============================
+### ------ Condensed figure of Fst and Dxy for Science style -----
+# ============================
+
+# Put data together
+AllPopData <- rbind(cbind(PopDataChr1, chr = "chromosome_1"),
+                    cbind(PopDataChr2, chr = "chromosome_2"),
+                    cbind(PopDataChr3, chr = "chromosome_3"),
+                    cbind(PopDataChr4, chr = "chromosome_4"),
+                    cbind(PopDataChr5, chr = "chromosome_5"),
+                    cbind(PopDataChr6, chr = "chromosome_6"),
+                    cbind(PopDataChr7, chr = "chromosome_7") )
+
+AllFstConfIntvChr <- rbind(cbind(FstConfIntvChr1, chr = "chromosome_1"),
+                           cbind(FstConfIntvChr2, chr = "chromosome_2"),
+                           cbind(FstConfIntvChr3, chr = "chromosome_3"),
+                           cbind(FstConfIntvChr4, chr = "chromosome_4"),
+                           cbind(FstConfIntvChr5, chr = "chromosome_5"),
+                           cbind(FstConfIntvChr6, chr = "chromosome_6"),
+                           cbind(FstConfIntvChr7, chr = "chromosome_7") )
+
+
+scaleFUN <- function(x) sprintf("%.3f", x) # Function to change number of decimals in axis
+
+
+## Make a basic plotting of all chromosomes for a given statistic
+basesnyggscan <- function(PopData, FstConfIntv, stat = "Fst", minlen = 5000){
+  PopDataFiltered <- PopData %>% filter(variable == stat)
+  PopDataFiltered$value[which(PopDataFiltered$winlens <= minlen )] <- NA 
+  
+  p <- ggplot(PopDataFiltered, aes(x = position/1000000, y = value, colour = variable)) +
+    facet_grid(. ~ chr, scales = "free_x", space = "free_x") + 
+    # geom_area(data = AllFstConfIntvChr, aes(y = maxFst), colour = NA, fill = "darkslategray2", alpha = 0.5) +
+    geom_line(alpha = 0.7)
+  return(p)
+}
+
+## Make the output of basesnyggscan() "snyggare"
+snyggscan <- function(p, farg = "deepskyblue3", stat = "Fst"){
+  snygg <- p +
+    theme_bw() +
+    ylab(stat) + 
+    # xlab("Position (Mb)") + # I'll add this later
+    scale_x_continuous(breaks = seq(0,8,2), expand = c(0.02, 0.02)) + # Remove the white space on the sides
+    
+    theme(plot.title = element_text(size = rel(1.3), face="bold", family = "Helvetica", hjust = 0.5),
+          # axis.title.y=element_blank(),
+          axis.title.x=element_blank(),
+          axis.text = element_text(size = rel(1)),
+          legend.key=element_blank(), # remove background of the key in the legend
+          legend.title=element_blank(),
+          legend.text=element_text(size=rel(0.9)),
+          # legend.position=c(0.08, 0.7),
+          panel.grid.minor = element_blank(), # so there are not so many lines
+          legend.spacing.y = unit(0.005, 'cm'), # Put the items of the legend closer to each other
+          strip.background = element_rect(color="white", fill="white", size=1.5, linetype="solid"),
+          legend.background=element_blank()) +
+    scale_color_manual(values= farg, guide= FALSE) + # change color of lines
+    scale_y_continuous(labels=scaleFUN, limits = c(0, 1)) +
+    geom_line(aes(linetype = variable), alpha = 0.5) + scale_linetype_manual(values=c("solid"), guide = FALSE) +
+    geom_point(data = genes %>% filter(locus %in% c("Centromere", "het-r", "het-v")) %>% mutate(position = position/1000000), 
+               aes(x = position, shape = locus, fill = locus), colour = "black", size = 3) +
+    scale_shape_manual(values=c(16,15,17))
+  return(snygg)
+}
+
+# Plot Fst
+fstscan <- basesnyggscan(AllPopData, AllFstConfIntvChr, stat = "Fst", minlen = 5000)
+fstscan <- snyggscan(fstscan, farg = "deepskyblue3", stat = "Fst") + theme(legend.position=c(0.08, 0.7))
+
+# Plot Dxy
+dxyscan <- basesnyggscan(AllPopData, AllFstConfIntvChr, stat = "Dxy", minlen = 5000)
+dxyscan <- snyggscan(dxyscan, farg = "cadetblue4", stat = "Dxy") + theme(legend.position="none") + ylim(0, maxPi) 
+
+# Put together
+thescans <- plot_grid(fstscan, dxyscan, ncol = 1)
+
+# Create common xlabel
+x.grob <- textGrob("Position (Mbp)", gp=gpar(col="black", fontsize=12))
+
+# Make final plot
+mainscans <- grid.arrange(arrangeGrob(thescans, bottom = x.grob))
+
+# Save plot
+ggsave(plot = mainscans, snakemake@output[[18]], width = 23, height = 10, units = "cm")
+# ggsave(plot = mainscans, "/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/9b_DiversityStatsWa/results/figures/Fig2_GenomeScans.pdf", width = 23, height = 10, units = "cm")
+
