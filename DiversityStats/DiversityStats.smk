@@ -60,6 +60,7 @@ rule all:
 		"results/figures/FigS5_Dxy_supp.png", # MAIN figure 
 		"results/figures/Fig4_HetVRgenotypes.pdf", # MAIN figure
 		"results/stats/highTajima.csv", # Useful here
+		"results/figures/FigS_hetB.pdf" # supplementary figure
 
 rule getannotation:
 	""" Get Podan2 annotation """
@@ -349,6 +350,7 @@ rule plotstats:
 		supdxy = "results/figures/FigS5_Dxy_supp.png", # MAIN figure 
 		extratajima = "results/figures/Tajima_supp.pdf", # Useful for me
 		tajimatable = "results/stats/highTajima.csv", # Useful here
+		hetq = "results/figures/FigS_hetB.pdf" # supplementary figure
 	conda: 
 		"envs/statsplot.yaml"
 	params:
