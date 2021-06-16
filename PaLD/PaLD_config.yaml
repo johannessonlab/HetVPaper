@@ -6,7 +6,13 @@ groupV: ["PaWa1p", "PaWa2m", "PaWa3m", "PaWa4p", "PaWa10p", "PaWa11m", "PaWa12p"
 groupA: ["PaWa7m", "PaWa8p", "PaWa9m", "PaWa15m", "PaWa17m", "PaWa18p", "PaWa21m", "PaWa25p", "PaWa26m", "PaWa27m", "PaWa28m", "PaWa38p", "PaWa45p", "PaWa46p", "PaWa47m", "PaWa49m", "PaWa57p", "PaWa60p", "PaWa61m", "PaWa63p", "PaWa64m", "PaWa71p", "PaWa72m", "PaWa76p", "PaWa77m", "PaWa78p", "PaWa79m", "PaWa86m", "PaWa88p", "PaWa89p", "PaWa91p", "PaWa96m", "PaWa97p", "PaWa101m", "PaWa103m", "PaWa104m", "PaWa105p", "PaWa107m", "PaWa108m", "PaWa109p", "PaWa115m", "PaWa116p", "PaWa118p", "PaWa124p", "PaWa126p", "PaWa128p", "PaWa137m", "PaWa142p", "PaWa143m"]
 
 # The variants file
-vcf: "SNPpop/results/PodoPop-snps-NoTEs-gatkPASS-NoSibs-miss1.vcf.gz"
+vcf: "../SNPpop/results/PodoPop-snps-NoTEs-gatkPASS-NoSibs-miss1.vcf.gz"
+
+# The metadata with the het-v genotypes
+PopData: "../SNPpop/data/SNPpopMetadata.csv"
+
+# The R environment
+envR: "envs/PaLDPlot.yaml"
 
 # Number of chromosomes (assuming vcf has contigs names like "chromosome_1")
 NCHR: 7
@@ -40,3 +46,5 @@ vcfconcat4LD: "scripts/vcfconcat4LD.py"
 # Plotting scripts
 PaLDPlot: "scripts/PaLDPlot-nls-grs.R"
 PaLDheatmap: "scripts/PaLDheatmap.R"
+PaLD_SNPvsHetV: "scripts/PaLD_SNPvsHetV.R"
+
