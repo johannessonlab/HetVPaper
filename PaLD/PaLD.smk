@@ -28,6 +28,10 @@ notWa = config["notWa"]
 groupV = config["groupV"]
 groupA = config["groupA"]
 vcf = config["vcf"] # The variants file
+PopData = config["PopData"] # The metadata with the het-v genotypes
+
+# The R environment file
+envR = config["envR"]
 
 chrs = list(range(1, config["NCHR"] + 1)) # Number of chromosomes (assuming vcf has contigs names like "chromosome_1")
 wins = list(range(1, config["NWIN"] + 1)) # Number of randomly sampled windows from each chromosome
@@ -47,6 +51,7 @@ hetrEND = config["hetrEND"]
 vcfconcat4LD = config["vcfconcat4LD"] # Manipulate vcf files
 PaLDPlot = config["PaLDPlot"] # Plotting script LD decay
 PaLDheatmap = config["PaLDheatmap"] # Plotting script LD heatmap
+PaLD_SNPvsHetV = config["PaLD_SNPvsHetV"] # Plotting script LD of genome SNPs vs het-v locus
 
 # -------------------------------------------------
 # ----------
@@ -70,7 +75,11 @@ rule all:
 		# LD heatmap
 		expand("results/figures/InterchrVR-LD_thin{thin}_maf{maf}.png", thin = THINhet, maf = MAFhet),
 		expand("results/figures/LDchr{nchr}_thin{thin}_maf{maf}.png", thin = THIN, nchr = chrs, maf = MAF), # Individual plots for me
-		expand("results/figures/LDchrALL_thin{thin}_maf{maf}.png", thin = THIN, maf = MAF)
+		expand("results/figures/LDchrALL_thin{thin}_maf{maf}.png", thin = THIN, maf = MAF),
+		expand("robjects/InterchrVR-LD_thin{thin}_maf{maf}.Rdata", thin = THINhet, maf = MAFhet),
+
+		# LD heatmap AND SNPs LD with het-v distributions
+		expand("results/figures/LDplots_thin{thin}_maf{maf}.png", thin = THINhet, maf = MAFhet)
 
 # **************************
 # ****** Prepare data ******
@@ -216,7 +225,7 @@ rule plotLDdecay:
 		time = "10:00",
 		threads = 1,
 	conda: 
-		"envs/PaLDPlot.yaml"
+		envR
 	script:
 		PaLDPlot
 
@@ -310,12 +319,28 @@ rule plotLDheatmap:
 	output:
 		expand("results/figures/InterchrVR-LD_thin{thin}_maf{maf}.png", thin = THINhet, maf = MAFhet),
 		expand("results/figures/LDchr{nchr}_thin{thin}_maf{maf}.png", thin = THIN, nchr = chrs, maf = MAF), # Individual plots for me
-		expand("results/figures/LDchrALL_thin{thin}_maf{maf}.png", thin = THIN, maf = MAF)
+		expand("results/figures/LDchrALL_thin{thin}_maf{maf}.png", thin = THIN, maf = MAF),
+		expand("robjects/InterchrVR-LD_thin{thin}_maf{maf}.Rdata", thin = THINhet, maf = MAFhet)
 	params:
 		time = "2:00:00",
 		threads = 5, # Give it more memory
 	conda: 
-		"envs/PaLDPlot.yaml"
+		envR
 	script:
 		PaLDheatmap	
 
+rule plotLDdistribition:
+	""" Plot the distribution of LD of genome SNPs with the het-v locus"""
+	input:
+		vcf = "data/vcfs/HighQWageningen.vcf.gz",
+		PopData = PopData,
+		heatmap = expand("robjects/InterchrVR-LD_thin{thin}_maf{maf}.Rdata", thin = THINhet, maf = MAFhet) # to get the fat plot from the previous script
+	output:
+		LDplots = expand("results/figures/LDplots_thin{thin}_maf{maf}.png", thin = THINhet, maf = MAFhet)
+	params:
+		time = "1:00:00",
+		threads = 5, # Give it more memory
+	conda:
+		envR
+	script:
+		PaLD_SNPvsHetV
