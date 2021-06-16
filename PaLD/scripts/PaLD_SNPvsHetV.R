@@ -2,7 +2,7 @@
 
 ### PaLD_SNPvsHetV: How linked are SNPs to the het-v locus along the genome?
 #############################################################################
-# Part of the Snakemake pipeline DiversityStats.smk
+# Part of the Snakemake pipeline PaLD.smk
 # =======================================
 # Sandra Lorena Ament Velasquez
 # Johannesson Lab, Evolutionary Biology Center, Uppsala University, Sweden
