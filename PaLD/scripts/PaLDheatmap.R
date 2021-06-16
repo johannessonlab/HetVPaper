@@ -152,7 +152,6 @@ hetvline <- data.frame(x1 = hetrEND + buffer, x2 = hetrEND + buffer + sizehetvre
 ## Same but with artificial background and removing small r2 values
 ## define the polygons for the background
 edge <- 20000 # Extra bp to add a border to the polygons
-MINR2hetrv = 0.00 # hetrv comparison
 
 triangle_r <- data.frame(id = "het-r",
                          x = c(hetrSTART - edge, hetrSTART + (hetrEND - hetrSTART)/2, hetrEND + edge),
@@ -170,7 +169,7 @@ triangles <- rbind(triangle_r, triangle_v, rombo)
 
 # plot again with background
 interchrs <- ggplot(hetVRld %>% filter(R.2 > MINR2hetrv), aes(x = MID, y = DIST)) +
-    theme_dark() +
+    # theme_dark() +
     scale_color_gradient2(mid = midcolor, high = highcolor) +
     # Chromosome lines
     geom_segment(aes(x = x1, y = y1, xend = x2, yend = y2), colour = "gray25", size = 3, data = hetrline) +
@@ -186,8 +185,8 @@ interchrs <- ggplot(hetVRld %>% filter(R.2 > MINR2hetrv), aes(x = MID, y = DIST)
     annotate(geom="text", x=hetrEND + buffer, y=-150000, label= as.character(hetvSTART), color="black", size = 2.3) + # label start of chr5
     annotate(geom="text", x=hetrEND + buffer + sizehetvregion, y=-150000, label= as.character(hetvEND), color="black", size = 2.3) + # label end of chr5
     # Chromosome labels
-    annotate(geom="text", x=hetrSTART + 500000, y=-200000, label= "Chromosome 2", color="white", size = 5) +
-    annotate(geom="text", x=hetrEND + buffer + 500000, y=-200000, label= "Chromosome 5", color="white", size = 5) + 
+    annotate(geom="text", x=hetrSTART + 500000, y=-200000, label= "Chromosome 2", color="black", size = 5) +
+    annotate(geom="text", x=hetrEND + buffer + 500000, y=-200000, label= "Chromosome 5", color="black", size = 5) +
     # Loci
     annotate(geom="text", x=hetRcoord, y=-110000, label= "het-r", color="black", size = 4) +  # label start of chr2
     annotate(geom="text", x=hetDcoord, y=-110000, label= "het-d", color="black", size = 4) +  # label start of chr2
@@ -210,6 +209,8 @@ interchrs <- ggplot(hetVRld %>% filter(R.2 > MINR2hetrv), aes(x = MID, y = DIST)
           panel.grid.major = element_blank(), panel.grid.minor = element_blank() )
     
 ggsave(plot = interchrs, snakemake@output[[1]], width = 20, height = 16, units = "cm")
+
+save(interchrs, snakemake@output[[10]]) # Save the object for plotting together with another thing #NEW
 
 # ============================
 # Plot intrachromosomal LD
