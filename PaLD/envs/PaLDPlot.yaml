@@ -10,3 +10,6 @@ dependencies: # R 3.6.1
   - r-hexbin=1.27.3
   - r-gridextra=2.3 # It includes grid
   - r-wesanderson=0.3.6
+  - r-vcfr=1.10.0
+  - r-vegan=2.5_6 # Otherwise vcfR doesn't work
+
