@@ -106,6 +106,7 @@ allpitajima <- function(PopData, thischr = "chromosome_5", thistitle = "Chromoso
           legend.text=element_text(size=rel(0.9)),
           legend.position=c(0.94, 0.56),
           legend.spacing.y = unit(0.005, 'cm'), # Put the items of the legend closer to each other
+          legend.spacing.x = unit(0.005, 'cm'), # Put the labels of the legend closer to the symbols
           legend.background=element_blank()) +
     scale_color_manual(values= c("firebrick1", "blue4"), labels=c(expression(pi["  "]), expression(theta["W"])) , guide=legend) + # The space in pi is to center it better...
     ylim(0, round(maxPi,digits=2)) +
@@ -332,7 +333,7 @@ diversitystats2 <- plot_grid(PopDataChr1plots,
                              rel_heights = c(1, 0.05, 1),
                              label_size = 12, ncol = 1) 
 
-plot_grid(diversitystats2, NULL, hetplots, ncol = 3, labels = c('A', '', 'B'),
+plot_grid(diversitystats2, NULL, hetplots, ncol = 3, labels = c('a', '', 'b'),
           label_size = 25, rel_widths = c(2, 0.05, 1))
 ggsave(snakemake@output$main2chrs, width = 14, height = 9)
 
