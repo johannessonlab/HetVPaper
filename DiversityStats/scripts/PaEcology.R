@@ -19,7 +19,7 @@ library(reshape2) # for melt
 # ============================
 
 hetrecord <- read.csv("../data/PaAllelesPaper.csv", header = TRUE, na.strings = "NA", sep=",") # Replace the path, as the relative paths won't work
-sampling2017 <- read.csv("../data/Sampling2017_20220422.csv", head = TRUE, na.strings = "NA", sep=",") # Replace the path, as the relative paths won't work
+sampling2017 <- read.csv("../data/Sampling2017_20220517.csv", head = TRUE, na.strings = "NA", sep=",") # Replace the path, as the relative paths won't work
 sampling2017 <- sampling2017 %>% filter(Indiv_count != "-" & Mating_phenotype != "P. comata") %>% select(c(Wa_numbers, Mating_phenotype, Dung, Indiv_count))
 sampling2017 <- sampling2017[!(is.na(sampling2017$Mating_phenotype)), ]  # Remove columns without phenotype data
 
