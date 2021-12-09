@@ -197,7 +197,7 @@ fst.plotter <- function(PopData, FstConfIntv, thistitle = "Chromosome 2", thisch
   
   p <- ggplot(PopDataFiltered, aes(x = position, y = value, colour = variable)) +
     # geom_ribbon(data = FstConfIntv, aes(ymin = Q1Fst, ymax = maxFst), colour = NA, fill = "darkslategray2", alpha = 0.5) +
-    geom_area(data = FstConfIntv, aes(y = maxFst), colour = NA, fill = "darkslategray2", alpha = 0.5) +
+    geom_area(data = FstConfIntv, aes(y = maxFst), colour = NA, fill = "coral2", alpha = 0.5) +
     geom_line(alpha = 0.7) +
     theme_bw() +
     labs(title = thistitle) +
