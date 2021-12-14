@@ -78,7 +78,8 @@ pam_fit2 <- pam(d2, k=2)
 ## --- Gap statistic ---
 set.seed(123)
 gap_stat <- clusGap(d2 %>% as.matrix(), FUN = pam, nstart = 25,
-                    K.max = 10, B = 500)
+                    K.max = 10, B = 500) 
+# Works with `cluster_2.1.2` locally but not with `cluster_2.1.0` in Uppmax. To make it work, you can remove the nstats parameter but see https://uc-r.github.io/kmeans_clustering
 plot(gap_stat, main = "clusGap(., FUN = pam, nstart=25, B= 500)")
 
 ### ----- Recalculate the PCoA -----
@@ -378,7 +379,7 @@ cat("The het-v haplotype recombinant samples are: ", samples[hybridindex])
 ## Put them all together for Figure S4
 # ============================
 
-figureS4 <- plot_grid(PCAallgenome, PaPCA12, PaPCA13, PaPCA23, ncol = 1, labels = c('A', 'B', 'C', 'D'), rel_heights = c(0.6, 1,1,1), label_size = 20)
+figureS4 <- plot_grid(PCAallgenome, PaPCA12, PaPCA13, PaPCA23, ncol = 1, labels = c('a', 'b', 'c', 'd'), rel_heights = c(0.6, 1,1,1), label_size = 20)
 
 ggsave(snakemake@output[[8]], plot=figureS4, width = 11, height = 21)
 # ggsave("/Users/Lorena/Dropbox/PhD_UU/Analyses/SnakePipelines/8_SNPpop/results/Figures/FigS4_PCAs.pdf", plot=figureS4, width = 11, height = 21)
