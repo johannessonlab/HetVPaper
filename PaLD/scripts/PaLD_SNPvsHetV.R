@@ -178,7 +178,7 @@ LDsnpsHetV <- ggplot(ldSNPs_all2, aes(x = CHROM, y = R.2, fill = CHROM)) + geom_
 #                             "chromosome_4" = "Chr 4", "chromosome_5" = "Chr 5", "chromosome_6" = "Chr 6", "chromosome_7" = "Chr 7"))
 # 
 cat("*** Putting plots together ***\n")
-LDplots <- plot_grid(LDsnpsHetV, interchrs, labels = c('A', 'B'), ncol = 1, rel_heights = c(1, 2))
+LDplots <- plot_grid(LDsnpsHetV, interchrs, labels = c('a', 'b'), ncol = 1, rel_heights = c(1, 2))
 
 ggsave(outputplot, plot = LDplots, width = 19, height = 23, units = "cm")
 
