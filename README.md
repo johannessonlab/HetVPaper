@@ -15,5 +15,9 @@ I ran the pipelines in Uppsala University's supercomputer [UPPMAX](https://uppma
 
 ---
 
+There are two scripts that are not part of the Snakemake pipelines: `DiversityStats/scripts/PaEcology.R` and `MutantsFertility/scripts/PaMutantsFertility.R`. They have to be run manually and require the input and output names to be changed in order to work!
+
+---
+
 In addition to the bioinformatic pipelines, the folder `SLiMsimulations` contains the code and simulations using [SLiM 3](https://academic.oup.com/mbe/article/36/3/632/5229931) written by Ivain Martinossi.
   
