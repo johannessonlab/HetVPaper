@@ -47,7 +47,7 @@ substrateplot <- ggplot(herbiabundance, aes(fill=Het.v, x=Herbivore, y=value)) +
   theme_cowplot() + 
   ylab("Count") + ggtitle("1991-2016") +
   theme(axis.title.x = element_blank(), plot.title = element_text(hjust = 0.5)) +
-  scale_fill_manual(values= c("#B66DE9", "darkseagreen3"), guide = FALSE) +
+  scale_fill_manual(values= c("#B66DE9", "darkseagreen3"), guide = "none") +
   annotate("text", x = 1, y=52, label = "n.s.") + 
   annotate("text", x = 2, y=32, label = "n.s.") 
 
