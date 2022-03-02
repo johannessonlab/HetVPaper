@@ -16,8 +16,8 @@
 # a linear one and iteratively try to find the best parameter values.
 
 # The aim of this script is to plot the non-linear regression for all samples
-# and the two mating groups, to see if there are differences. I also can aim to 
-# report back some values of rho.
+# and the two reproductively isolated groups, to see if there are differences. 
+# I also can aim to report back some values of rho.
 # =======================================
 # Sandra Lorena Ament Velasquez
 # Johannesson Lab, Evolutionary Biology Center, Uppsala University, Sweden
@@ -227,7 +227,7 @@ decayallfits.final <- grid.arrange(arrangeGrob(decayallfits, left = y.grob, bott
 ggsave(plot = decayallfits.final, snakemake@output[[1]], width = 20, height = 11, units = "cm")
 
 ### -------
-cat("*** Plotting Remington's curves per mating group ***\n")
+cat("*** Plotting Remington's curves per reproductively isolated group ***\n")
 # Extract the legend alone
 legend <- cowplot::get_legend(HNnls_plotter(rbind(chr7ld.all.fit, chr7ld.grV.fit, chr7ld.grA.fit), "Chromosome 7", legend = 'right'))
 
