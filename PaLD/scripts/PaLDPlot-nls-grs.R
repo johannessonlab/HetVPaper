@@ -185,6 +185,7 @@ chr5ld.all.fit <- HWnonlinear(chr5ld.all, n = n.all, pop = "All")
 chr6ld.all.fit <- HWnonlinear(chr6ld.all, n = n.all, pop = "All")
 chr7ld.all.fit <- HWnonlinear(chr7ld.all, n = n.all, pop = "All")
 
+# For RI group with the V allele
 chr1ld.grV.fit <- HWnonlinear(chr1ld.grV, n = n.grV, pop = "V")
 chr2ld.grV.fit <- HWnonlinear(chr2ld.grV, n = n.grV, pop = "V")
 chr3ld.grV.fit <- HWnonlinear(chr3ld.grV, n = n.grV, pop = "V")
@@ -193,6 +194,7 @@ chr5ld.grV.fit <- HWnonlinear(chr5ld.grV, n = n.grV, pop = "V")
 chr6ld.grV.fit <- HWnonlinear(chr6ld.grV, n = n.grV, pop = "V")
 chr7ld.grV.fit <- HWnonlinear(chr7ld.grV, n = n.grV, pop = "V")
 
+# For RI group with the V1 allele
 chr1ld.grA.fit <- HWnonlinear(chr1ld.grA, n = n.grA, pop = "V1")
 chr2ld.grA.fit <- HWnonlinear(chr2ld.grA, n = n.grA, pop = "V1")
 chr3ld.grA.fit <- HWnonlinear(chr3ld.grA, n = n.grA, pop = "V1")
@@ -201,15 +203,18 @@ chr5ld.grA.fit <- HWnonlinear(chr5ld.grA, n = n.grA, pop = "V1")
 chr6ld.grA.fit <- HWnonlinear(chr6ld.grA, n = n.grA, pop = "V1")
 chr7ld.grA.fit <- HWnonlinear(chr7ld.grA, n = n.grA, pop = "V1")
 
+# Chromosome 4 is acting weird, likely because of the high Tajima's D blocks at the extremes
+chr4ld.all.fit_reduce <- HWnonlinear(chr4ld.all %>% filter(POS1 > 1000000  & POS1 < 3500000), n = n.all, pop = "All")
+
 cat("*** Plotting full LD decay curves for all samples ***\n")
 # Extract the legend alone
-legend <- cowplot::get_legend(henchHNnls(chr7ld.all.fit, ld2bins(chr7ld.all.fit), "Chromosome 7", legend = 'right'))
+legend <- cowplot::get_legend(henchHNnls(chr7ld.all.fit, ld2bins(chr7ld.all.fit), "Chromosome 7", legend = 'bottom'))
 
 # Create common x and y labels
 x.grob <- textGrob("Distance (Kbp)", gp=gpar(col="black", fontsize=11))
 y.grob <- textGrob(expression(Linkage~(r^2)), gp=gpar(fontface="bold", col="black", fontsize=11), rot=90)
 
-decayallfits <- plot_grid(
+plotsLD <- plot_grid(
   henchHNnls(chr1ld.all.fit, ld2bins(chr1ld.all.fit), thistitle = "Chromosome 1"),
   henchHNnls(chr2ld.all.fit, ld2bins(chr2ld.all.fit), thistitle = "Chromosome 2"),
   henchHNnls(chr3ld.all.fit, ld2bins(chr3ld.all.fit), thistitle = "Chromosome 3"),
@@ -217,14 +222,16 @@ decayallfits <- plot_grid(
   henchHNnls(chr5ld.all.fit, ld2bins(chr5ld.all.fit), thistitle = "Chromosome 5"),
   henchHNnls(chr6ld.all.fit, ld2bins(chr6ld.all.fit), thistitle = "Chromosome 6"),
   henchHNnls(chr7ld.all.fit, ld2bins(chr7ld.all.fit), thistitle = "Chromosome 7"),
-  legend,
-  align = "h", ncol = 4, nrow = 2) 
+  henchHNnls(chr4ld.all.fit_reduce, ld2bins(chr4ld.all.fit_reduce), thistitle = "Chromosome 4:1-3.5Mb"),
+  align = "h", ncol = 4, nrow = 2)
 
 # Add axes labels to plot
-decayallfits.final <- grid.arrange(arrangeGrob(decayallfits, left = y.grob, bottom = x.grob))
+decayallfits <- grid.arrange(arrangeGrob(plotsLD, left = y.grob, bottom = x.grob))
+# Add legend at the bottom
+decayallfits.final <- plot_grid(decayallfits, legend, ncol = 1, nrow = 2, rel_heights = c(4, 0.3))
 
 # Save
-ggsave(plot = decayallfits.final, snakemake@output[[1]], width = 20, height = 11, units = "cm")
+ggsave(plot = decayallfits.final, snakemake@output[[1]], width = 22, height = 13, units = "cm")
 
 ### -------
 cat("*** Plotting Remington's curves per reproductively isolated group ***\n")
