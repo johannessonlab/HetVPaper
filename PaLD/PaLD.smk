@@ -171,8 +171,8 @@ rule randomWindLD:
 
 		# The minimum MAF is tailored to remove singletons
 		vcftools --gzvcf {input.allwa} --chr chromosome_{wildcards.nchr} --from-bp $RN1 --to-bp $RN2 --hap-r2 --stdout --maf 0.01 > {output.allwa} # all samples together
-		vcftools --gzvcf {input.grV} --chr chromosome_{wildcards.nchr} --from-bp $RN1 --to-bp $RN2 --hap-r2 --stdout --maf 0.025 > {output.grV} # Mating group V
-		vcftools --gzvcf {input.grA} --chr chromosome_{wildcards.nchr} --from-bp $RN1 --to-bp $RN2 --hap-r2 --stdout --maf 0.025 > {output.grA} # Mating group A
+		vcftools --gzvcf {input.grV} --chr chromosome_{wildcards.nchr} --from-bp $RN1 --to-bp $RN2 --hap-r2 --stdout --maf 0.025 > {output.grV} # RI group V
+		vcftools --gzvcf {input.grA} --chr chromosome_{wildcards.nchr} --from-bp $RN1 --to-bp $RN2 --hap-r2 --stdout --maf 0.025 > {output.grA} # RI group A (=V1)
 		""" 
 
 rule catLDdecayPerChrAll:
@@ -219,7 +219,7 @@ rule plotLDdecay:
 		expand("LDdecay/dist-grA.chr{nchr}.hap.ld.gz", nchr = chrs),
 	output:
 		"results/figures/LDdecayAllFit.pdf", # LD decay curve with raw data like Hench et al (2019), the Remington's non-linear regression, and the average r2 in bins with a smoothing line 
-		"results/figures/LDdecayFitMG.pdf", # LD decay curve with just the Remington's fit, but for all and for each mating group
+		"results/figures/LDdecayFitMG.pdf", # LD decay curve with just the Remington's fit, but for all and for each RI group
 		"results/stats/LDdecayMid.csv", # A little table with aprox LD values at around r^2 = 0.2 per chromosome
 	params:
 		time = "10:00",
